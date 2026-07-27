@@ -112,19 +112,17 @@ jobs:
           source: deploy-release.sh
           target: /tmp
 
-          - name: Deploy artifact over SSH
+      - name: Deploy artifact over SSH
         uses: appleboy/ssh-action@v1.2.0
         env:
           SHA: ${{ github.sha }}
           APP_DIR: ${{ secrets.LIGHTSAIL_APP_DIR }}
           HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
-
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
-
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USER }}
