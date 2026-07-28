@@ -96,9 +96,10 @@ export function FileoraHubClient() {
   }, []);
 
   return (
-    <>
+    <div className="fileora-hub">
       {/* Hero */}
       <section
+        className="fileora-hub__hero"
         style={{
           position: "relative",
           overflow: "hidden",
@@ -132,8 +133,12 @@ export function FileoraHubClient() {
           }}
         />
 
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+        <div
+          className="fileora-hub__container"
+          style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}
+        >
           <div
+            className="fileora-hub__hero-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "minmax(0, 1.15fr) minmax(260px, 0.85fr)",
@@ -142,8 +147,8 @@ export function FileoraHubClient() {
               marginBottom: 48,
             }}
           >
-            <div style={{ textAlign: "left" }}>
-              <div className="badge" style={{ marginBottom: 24 }}>
+            <div className="fileora-hub__hero-copy" style={{ textAlign: "left" }}>
+              <div className="badge fileora-hub__badge" style={{ marginBottom: 24 }}>
                 <span
                   style={{
                     width: 6,
@@ -165,6 +170,7 @@ export function FileoraHubClient() {
                   transition={{ duration: 0.35, ease: "easeOut" }}
                 >
                   <h1
+                    className="fileora-hub__title"
                     style={{
                       fontFamily: "var(--font-display)",
                       fontSize: "clamp(32px, 5.2vw, 58px)",
@@ -181,6 +187,7 @@ export function FileoraHubClient() {
                   </h1>
 
                   <p
+                    className="fileora-hub__desc"
                     style={{
                       fontSize: "clamp(15px, 2vw, 17px)",
                       color: "var(--color-text-2)",
@@ -197,6 +204,7 @@ export function FileoraHubClient() {
             </div>
 
             <div
+              className="fileora-hub__hero-graphic"
               style={{
                 display: "flex",
                 justifyContent: "flex-end",
@@ -210,11 +218,12 @@ export function FileoraHubClient() {
             </div>
           </div>
 
-          <div id="upload-widget">
+          <div id="upload-widget" className="fileora-hub__upload">
             <SmartUploadWidget preferredTool={preferredTool ?? undefined} />
           </div>
 
           <div
+            className="fileora-hub__trust"
             style={{
               display: "flex",
               flexWrap: "wrap",
@@ -267,6 +276,7 @@ export function FileoraHubClient() {
 
       {/* Stats */}
       <section
+        className="fileora-hub__stats"
         style={{
           borderTop: "1px solid var(--color-border)",
           borderBottom: "1px solid var(--color-border)",
@@ -274,6 +284,7 @@ export function FileoraHubClient() {
         }}
       >
         <div
+          className="fileora-hub__stats-grid"
           style={{
             maxWidth: 1200,
             margin: "0 auto",
@@ -317,8 +328,15 @@ export function FileoraHubClient() {
       </section>
 
       {/* Tools — Category Accordion */}
-      <section id="tools" style={{ padding: "80px 24px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+      <section
+        id="tools"
+        className="fileora-hub__section"
+        style={{ padding: "80px 24px" }}
+      >
+        <div
+          className="fileora-hub__container"
+          style={{ maxWidth: 1200, margin: "0 auto" }}
+        >
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <h2
               style={{
@@ -347,6 +365,7 @@ export function FileoraHubClient() {
 
           {/* Category tabs */}
           <div
+            className="fileora-hub__category-tabs"
             style={{
               display: "flex",
               gap: 12,
@@ -409,6 +428,7 @@ export function FileoraHubClient() {
               openCategory === cat.id && (
                 <div
                   key={cat.id}
+                  className="fileora-hub__tools-grid"
                   style={{
                     display: "grid",
                     gridTemplateColumns:
@@ -483,13 +503,17 @@ export function FileoraHubClient() {
 
       {/* Why Fileora */}
       <section
+        className="fileora-hub__section fileora-hub__why"
         style={{
           padding: "80px 24px",
           borderTop: "1px solid var(--color-border)",
           borderBottom: "1px solid var(--color-border)",
         }}
       >
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <div
+          className="fileora-hub__container"
+          style={{ maxWidth: 1200, margin: "0 auto" }}
+        >
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <h2
               style={{
@@ -515,6 +539,7 @@ export function FileoraHubClient() {
             </p>
           </div>
           <div
+            className="fileora-hub__why-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
@@ -522,7 +547,11 @@ export function FileoraHubClient() {
             }}
           >
             {whyItems.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="feature-card glow-hover" style={{ padding: "24px" }}>
+              <div
+                key={title}
+                className="feature-card glow-hover fileora-hub__why-card"
+                style={{ padding: "24px" }}
+              >
                 <div
                   className="feature-card__icon"
                   style={{
@@ -568,8 +597,15 @@ export function FileoraHubClient() {
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" style={{ padding: "80px 24px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
+      <section
+        id="how-it-works"
+        className="fileora-hub__section"
+        style={{ padding: "80px 24px" }}
+      >
+        <div
+          className="fileora-hub__container"
+          style={{ maxWidth: 900, margin: "0 auto" }}
+        >
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <h2
               style={{
@@ -585,6 +621,7 @@ export function FileoraHubClient() {
             </h2>
           </div>
           <div
+            className="fileora-hub__steps-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
@@ -657,12 +694,16 @@ export function FileoraHubClient() {
       {/* FAQ */}
       <section
         id="faq"
+        className="fileora-hub__section"
         style={{
           padding: "80px 24px",
           borderTop: "1px solid var(--color-border)",
         }}
       >
-        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+        <div
+          className="fileora-hub__container"
+          style={{ maxWidth: 760, margin: "0 auto" }}
+        >
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <h2
               style={{
@@ -679,7 +720,11 @@ export function FileoraHubClient() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {FILEORA_FAQS.map(({ question, answer }) => (
-              <div key={question} className="feature-card glow-hover" style={{ padding: "20px 24px" }}>
+              <div
+                key={question}
+                className="feature-card glow-hover"
+                style={{ padding: "20px 24px" }}
+              >
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
@@ -709,6 +754,6 @@ export function FileoraHubClient() {
       </section>
 
       <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
-    </>
+    </div>
   );
 }
