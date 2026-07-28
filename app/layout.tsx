@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { MicrosoftClarity } from "@/components/analytics/MicrosoftClarity";
 import { buildRootMetadata } from "@/lib/seo";
+import Script from "next/script";
 
 export const metadata = buildRootMetadata();
 
@@ -24,6 +25,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           fetchPriority="low"
         />
+        <Script
+    id="monetag-vignette"
+    strategy="afterInteractive"
+    dangerouslySetInnerHTML={{
+      __html: `(function(s){s.dataset.zone='11442264',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
+    }}
+  />
       </head>
       <body>
         {children}
