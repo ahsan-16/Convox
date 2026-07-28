@@ -22,10 +22,14 @@
  * (WebPage, SoftwareApplication, BreadcrumbList, FAQPage) anchor to that
  * route's own canonical URL, so every route gets its own stable id
  * without any global registry of used fragments.
+ *
+ * Note: `absoluteUrl("/")` returns the bare origin (no trailing slash) so
+ * canonicals match Next.js. Home-anchored `@id`s still use
+ * `{origin}/#fragment` via {@link withFragment}.
  */
 
 import { PATHS } from "../routes";
-import { absoluteUrl } from "../url";
+import { absoluteUrl, getSiteOrigin } from "../url";
 
 import type { JsonLdRef } from "./types";
 
@@ -38,7 +42,16 @@ const SOFTWARE_APPLICATION_FRAGMENT = "software";
 const BREADCRUMB_FRAGMENT = "breadcrumb";
 const FAQ_FRAGMENT = "faq";
 
+/**
+ * Joins a canonical absolute URL with a fragment for a stable `@id`.
+ * Root/home URLs always become `{origin}/#fragment` (slash before hash);
+ * path URLs become `{origin}/path#fragment`.
+ */
 function withFragment(absoluteBaseUrl: string, fragment: string): string {
+  const origin = getSiteOrigin().origin;
+  if (absoluteBaseUrl === origin || absoluteBaseUrl === `${origin}/`) {
+    return `${origin}/#${fragment}`;
+  }
   return `${absoluteBaseUrl}#${fragment}`;
 }
 

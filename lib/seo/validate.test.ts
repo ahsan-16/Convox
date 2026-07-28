@@ -718,10 +718,10 @@ describe("buildAuditReport — real registry, Task 9 initial indexing policy", (
     const report = buildAuditReport();
 
     const toolSlugs = new Set(Object.keys(TOOL_CONFIG) as ToolSlug[]);
-    const nonToolRouteCount = ROUTES.length - toolSlugs.size;
+    const declaredIndexableCount = ROUTES.filter((route) => route.index).length;
 
-    expect(report.summary.indexedRoutes).toBe(nonToolRouteCount);
-    expect(report.summary.sitemapRoutes).toBe(nonToolRouteCount);
+    expect(report.summary.indexedRoutes).toBe(declaredIndexableCount);
+    expect(report.summary.sitemapRoutes).toBe(declaredIndexableCount);
     expect(report.summary.environment.effectiveIndexingActive).toBe(true);
 
     const indexedEntries = report.routes.filter((entry) => entry.effectiveIndex);
@@ -733,6 +733,12 @@ describe("buildAuditReport — real registry, Task 9 initial indexing policy", (
     const hubEntry = report.routes.find((entry) => entry.id === "fileora-hub");
     expect(homeEntry?.effectiveIndex).toBe(true);
     expect(hubEntry?.effectiveIndex).toBe(true);
+
+    for (const id of ["careers", "blog", "docs", "status"] as const) {
+      const placeholder = report.routes.find((entry) => entry.id === id);
+      expect(placeholder?.effectiveIndex).toBe(false);
+      expect(placeholder?.effectiveSitemap).toBe(false);
+    }
 
     const toolEntries = report.routes.filter((entry) => toolSlugs.has(entry.id as ToolSlug));
     expect(toolEntries.length).toBeGreaterThan(0);

@@ -41,6 +41,9 @@ Trailing slashes on the configured origin are normalized away via `URL.origin`.
 - Root path: `/`
 - All other paths: lowercase kebab-case, leading slash, **no** trailing slash
 - Canonicals are always absolute and derived from route definitions + `getSiteOrigin()` / `absoluteUrl()`
+- `absoluteUrl("/")` returns the bare origin with **no** trailing slash
+  (e.g. `https://example.com`), matching Next.js canonical / `og:url`
+  normalization. JSON-LD home-anchored `@id`s still use `{origin}/#fragment`.
 - Locale prefixes are reserved for future i18n; English currently emits no prefix
 
 ## Related APIs

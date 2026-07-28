@@ -1,13 +1,8 @@
-import type { Metadata } from "next";
 import { ContributePageContent } from "@/components/marketing/zolvstack/ContributePageContent";
 import { ZolvStackPageShell } from "@/components/layout/ZolvStackPageShell";
+import { buildMetadataForRoute, ROUTE_IDS } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contribute | ZolvStack",
-  description:
-    "ZolvStack is open source and community-driven. Contribute features, bug fixes, documentation, ideas, testing, or community support.",
-  robots: { index: false, follow: true },
-};
+export const metadata = buildMetadataForRoute(ROUTE_IDS.CAREERS);
 
 export default function CareersPage() {
   return (

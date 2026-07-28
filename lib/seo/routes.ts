@@ -50,6 +50,10 @@ export const ROUTE_IDS = Object.freeze({
   SECURITY: "security",
   PRIVACY: "privacy",
   TERMS: "terms",
+  CAREERS: "careers",
+  BLOG: "blog",
+  DOCS: "docs",
+  STATUS: "status",
   FILEORA_HUB: "fileora-hub",
 } as const);
 
@@ -66,6 +70,10 @@ export const PATHS = Object.freeze({
   SECURITY: "/security",
   PRIVACY: "/privacy",
   TERMS: "/terms",
+  CAREERS: "/careers",
+  BLOG: "/blog",
+  DOCS: "/docs",
+  STATUS: "/status",
   FILEORA: FILEORA_BASE,
 } as const);
 
@@ -268,6 +276,49 @@ const BRAND_ROUTES: readonly SeoRoute[] = [
     follow: true,
     sitemapPriority: 0.3,
     changeFrequency: "yearly",
+  },
+  // Placeholder / coming-soon brand pages: registered for canonical + OG
+  // parity, but intentionally non-indexable until real content ships.
+  {
+    id: ROUTE_IDS.CAREERS,
+    path: PATHS.CAREERS,
+    pageType: "brand-static",
+    title: brandStaticTitle("Contribute"),
+    description:
+      "ZolvStack is open source and community-driven. Contribute features, bug fixes, documentation, ideas, testing, or community support.",
+    index: false,
+    sitemap: false,
+    follow: true,
+  },
+  {
+    id: ROUTE_IDS.BLOG,
+    path: PATHS.BLOG,
+    pageType: "brand-static",
+    title: brandStaticTitle("Blog"),
+    description: "Updates, product news, and insights from the ZolvStack team.",
+    index: false,
+    sitemap: false,
+    follow: true,
+  },
+  {
+    id: ROUTE_IDS.DOCS,
+    path: PATHS.DOCS,
+    pageType: "brand-static",
+    title: brandStaticTitle("Documentation"),
+    description: "Documentation for ZolvStack products and developer resources.",
+    index: false,
+    sitemap: false,
+    follow: true,
+  },
+  {
+    id: ROUTE_IDS.STATUS,
+    path: PATHS.STATUS,
+    pageType: "brand-static",
+    title: brandStaticTitle("Status"),
+    description: "Service status and uptime information for ZolvStack products.",
+    index: false,
+    sitemap: false,
+    follow: true,
   },
 ];
 

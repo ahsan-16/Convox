@@ -1,13 +1,21 @@
+import { JsonLd } from "@/components/seo/JsonLd";
 import { TermsPageContent } from "@/components/marketing/company/TermsPageContent";
 import { ZolvStackPageShell } from "@/components/layout/ZolvStackPageShell";
-import { buildMetadataForRoute, ROUTE_IDS } from "@/lib/seo";
+import {
+  buildJsonLdForRoute,
+  buildMetadataForRoute,
+  ROUTE_IDS,
+} from "@/lib/seo";
 
 export const metadata = buildMetadataForRoute(ROUTE_IDS.TERMS);
 
 export default function TermsPage() {
   return (
-    <ZolvStackPageShell>
-      <TermsPageContent />
-    </ZolvStackPageShell>
+    <>
+      <JsonLd data={buildJsonLdForRoute(ROUTE_IDS.TERMS)} />
+      <ZolvStackPageShell>
+        <TermsPageContent />
+      </ZolvStackPageShell>
+    </>
   );
 }

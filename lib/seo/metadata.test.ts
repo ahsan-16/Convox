@@ -24,6 +24,22 @@ describe("buildRootMetadata", () => {
     });
   });
 
+  it("declares site-wide icons, apple touch icon, and the web manifest", () => {
+    stubOrigin();
+    const metadata = buildRootMetadata();
+    expect(metadata.manifest).toBe("/manifest.json");
+    expect(metadata.icons).toMatchObject({
+      apple: [
+        expect.objectContaining({
+          url: "/apple-touch-icon.png",
+          sizes: "180x180",
+        }),
+      ],
+    });
+    const icons = metadata.icons;
+    expect(icons && typeof icons === "object" && "icon" in icons).toBe(true);
+  });
+
   it("keeps OG/Twitter titles as the plain final home title string", () => {
     stubOrigin();
     const metadata = buildRootMetadata();

@@ -73,7 +73,7 @@ describe("buildSitemap", () => {
     stubEnvironment({ appUrl: "https://www.example.com" });
 
     for (const entry of buildSitemap()) {
-      expect(entry.url).toMatch(/^https:\/\/www\.example\.com\//);
+      expect(entry.url).toMatch(/^https:\/\/www\.example\.com(?:\/|$)/);
       expect(new URL(entry.url).protocol).toBe("https:");
     }
   });

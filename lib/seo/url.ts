@@ -128,7 +128,9 @@ function normalizePath(path: string): string {
  *
  * @param path - Site-relative path (e.g. `/`, `/fileora`, `/about`)
  * @param locale - Locale id; defaults to `"en"` (no path prefix today)
- * @returns Absolute URL with no trailing slash except for the site root
+ * @returns Absolute URL with **no** trailing slash, including the site root
+ * (`https://example.com` not `https://example.com/`). Matches Next.js
+ * canonical/`og:url` normalization and keeps schema/canonical URLs aligned.
  * @throws {Error} When {@link getSiteOrigin} rejects the configured origin
  */
 export function absoluteUrl(path: string, locale: Locale = "en"): string {
@@ -137,10 +139,10 @@ export function absoluteUrl(path: string, locale: Locale = "en"): string {
   const normalizedPath = normalizePath(path);
 
   if (!prefix) {
-    return normalizedPath === "/" ? `${origin}/` : `${origin}${normalizedPath}`;
+    return normalizedPath === "/" ? origin : `${origin}${normalizedPath}`;
   }
 
   return normalizedPath === "/"
-    ? `${origin}${prefix}/`
+    ? `${origin}${prefix}`
     : `${origin}${prefix}${normalizedPath}`;
 }

@@ -60,7 +60,7 @@ export function ZolvStackHomeClient() {
             color: "#fff",
           }}
         >
-          Tools that actually
+          ZolvStack — tools that actually
           <br />
           <span className="text-gradient">get things done.</span>
         </h1>
@@ -75,8 +75,8 @@ export function ZolvStackHomeClient() {
             fontWeight: 300,
           }}
         >
-          A growing collection of free, fast, and private web tools — no
-          subscriptions, no watermarks, no nonsense.
+          ZolvStack is a growing collection of free, fast, and private web
+          tools — no subscriptions, no watermarks, no nonsense.
         </p>
 
         <Link

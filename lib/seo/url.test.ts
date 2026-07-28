@@ -67,9 +67,9 @@ describe("absoluteUrl", () => {
     vi.unstubAllEnvs();
   });
 
-  it("joins origin and path without trailing slash (except root)", () => {
+  it("joins origin and path without a trailing slash, including the root", () => {
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://example.com");
-    expect(absoluteUrl("/")).toBe("https://example.com/");
+    expect(absoluteUrl("/")).toBe("https://example.com");
     expect(absoluteUrl("/fileora")).toBe("https://example.com/fileora");
   });
 });

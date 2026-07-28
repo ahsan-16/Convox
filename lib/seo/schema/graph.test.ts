@@ -154,6 +154,9 @@ describe("buildJsonLdForRoute — brand home", () => {
     expect(website?.["@id"]).toBe(websiteId());
     expect(webPage?.["@id"]).toBe(webPageId(PATHS.HOME));
 
+    expect(organization?.description).toEqual(expect.any(String));
+    expect(String(organization?.description).length).toBeGreaterThan(20);
+    expect(organization?.sameAs).toBeUndefined();
     expect(asRef(organization?.logo)).toBe(logoImageId());
     expect(asRef(webPage?.isPartOf)).toBe(websiteId());
   });
@@ -418,6 +421,8 @@ describe("shared entity ids — reused exactly, never rebuilt", () => {
 
   it("resolves the same organization/website ids regardless of which route computes them", () => {
     stubOrigin();
+    expect(organizationId()).toBe("https://example.com/#organization");
+    expect(websiteId()).toBe("https://example.com/#website");
     expect(organizationId()).toBe(organizationId());
     expect(websiteId()).toBe(websiteId());
 
