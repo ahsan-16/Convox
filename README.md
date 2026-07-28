@@ -50,10 +50,18 @@ Open [http://localhost:3000](http://localhost:3000).
 - `NEXT_PUBLIC_GOOGLE_API_KEY` — required for the Google Drive picker. Restrict it by HTTP referrer in Google Cloud.
 - `NEXT_PUBLIC_GOOGLE_APP_ID` — optional Google Cloud project number; derived from the client ID when omitted.
 - `NEXT_PUBLIC_CLARITY_PROJECT_ID` — optional; enables Microsoft Clarity analytics.
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID` — optional; enables Google Analytics 4. Must be present in the GitHub Environment `production` variables used by `.github/workflows/deploy-main.yml` so it is baked into the Lightsail build artifact.
 - `SEO_INDEXING_ENABLED` — server-only; explicit opt-in for search indexing. See [SEO architecture](#seo-architecture) below.
 - `SEO_GOOGLE_SITE_VERIFICATION` / `SEO_BING_SITE_VERIFICATION` — server-only Search Console / Bing Webmaster Tools verification tokens. Optional; leave blank until configured.
+- `SMTP_HOST` — server-only; SMTP host for contact form mail (e.g. `smtp.gmail.com`).
+- `SMTP_PORT` — server-only; SMTP port (`587` STARTTLS or `465` SSL).
+- `SMTP_USER` — server-only; mailbox used to authenticate SMTP and as the message `From`.
+- `SMTP_PASS` — server-only; Gmail [App Password](https://support.google.com/accounts/answer/185833) (not the account password).
+- `CONTACT_EMAIL` — server-only; inbox that receives submissions. The visitor address is set as `Reply-To` only.
 
-Never commit `.env`, `.env.local`, or SSH/private keys. Production secrets (deploy host, keys) belong in GitHub Environment secrets, not the repo.
+Contact mail is sent by `POST /api/contact` via `lib/contact`. Set the SMTP vars in `.env.local` locally and on the Lightsail/PM2 runtime in production (not as `NEXT_PUBLIC_*`).
+
+Never commit `.env`, `.env.local`, or SSH/private keys. Production secrets (deploy host, keys, SMTP credentials) belong in GitHub Environment secrets or the Lightsail/PM2 runtime env, not the repo.
 
 ## Scripts
 

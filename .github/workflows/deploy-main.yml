@@ -21,6 +21,7 @@ jobs:
       NEXT_PUBLIC_GOOGLE_API_KEY: ${{ vars.NEXT_PUBLIC_GOOGLE_API_KEY }}
       NEXT_PUBLIC_GOOGLE_APP_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_APP_ID }}
       NEXT_PUBLIC_CLARITY_PROJECT_ID: ${{ vars.NEXT_PUBLIC_CLARITY_PROJECT_ID }}
+      NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
       SEO_GOOGLE_SITE_VERIFICATION: ${{ secrets.SEO_GOOGLE_SITE_VERIFICATION }}
       SEO_BING_SITE_VERIFICATION: ${{ secrets.SEO_BING_SITE_VERIFICATION }}
       SEO_INDEXING_ENABLED: ${{ vars.SEO_INDEXING_ENABLED }}
@@ -117,6 +118,11 @@ jobs:
           SHA: ${{ github.sha }}
           APP_DIR: ${{ secrets.LIGHTSAIL_APP_DIR }}
           HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          SMTP_PASS: ${{ vars.SMTP_PASS }}
+          CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USER }}
@@ -124,17 +130,21 @@ jobs:
           command_timeout: 30m
           debug: true
           script_stop: true
-          envs: SHA,APP_DIR,HEALTHCHECK_URL
+          envs: SHA,APP_DIR,HEALTHCHECK_URL,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASS,CONTACT_EMAIL
           script: |
             set -xe
             echo "=== Remote /tmp ==="
             ls -la /tmp
             echo "SHA=${SHA:-unset}"
             echo "APP_DIR=${APP_DIR:-unset}"
+
             if [ ! -f /tmp/deploy-release.sh ]; then
               echo "ERROR: /tmp/deploy-release.sh is missing"
               find /tmp -maxdepth 3 -type f | sort
               exit 1
             fi
+
             export SHA APP_DIR HEALTHCHECK_URL
+            export SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS CONTACT_EMAIL
+
             bash /tmp/deploy-release.sh
