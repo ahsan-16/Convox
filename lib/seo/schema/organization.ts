@@ -25,6 +25,20 @@ const LOGO_PATH = "/icons/icon-512.png";
 const LOGO_WIDTH = 512;
 const LOGO_HEIGHT = 512;
 
+/** Organization description — mirrors the home route SEO description for
+ * brand-entity clarity (helps disambiguate near-names like Zolve/Zolv). */
+const ORGANIZATION_DESCRIPTION =
+  "ZolvStack builds fast, private, browser-based tools for everyday work — starting with Fileora, a free file converter.";
+
+/**
+ * Official profile / social URLs for `Organization.sameAs`.
+ *
+ * Keep empty until real, public profiles exist. An empty array is pruned
+ * from the emitted graph (see `prune.ts`), so nothing is published until
+ * URLs are added here.
+ */
+export const ORGANIZATION_SAME_AS: readonly string[] = Object.freeze([]);
+
 /**
  * Builds the single, site-wide `Organization` node (ZolvStack). Its
  * `logo` is always an `{ "@id" }` reference to the canonical logo
@@ -38,6 +52,8 @@ export function buildOrganizationNode(): JsonLdNode {
     name: ZOLVSTACK_BRAND.name,
     url: absoluteUrl(PATHS.HOME),
     logo: ref(logoImageId()),
+    description: ORGANIZATION_DESCRIPTION,
+    sameAs: [...ORGANIZATION_SAME_AS],
   };
 }
 

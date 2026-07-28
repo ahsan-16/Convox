@@ -65,6 +65,25 @@ describe("ROUTES registry", () => {
     expect(getRoute(ROUTE_IDS.SECURITY).path).toBe(PATHS.SECURITY);
     expect(getRoute(ROUTE_IDS.PRIVACY).path).toBe(PATHS.PRIVACY);
     expect(getRoute(ROUTE_IDS.TERMS).path).toBe(PATHS.TERMS);
+    expect(getRoute(ROUTE_IDS.CAREERS).path).toBe(PATHS.CAREERS);
+    expect(getRoute(ROUTE_IDS.BLOG).path).toBe(PATHS.BLOG);
+    expect(getRoute(ROUTE_IDS.DOCS).path).toBe(PATHS.DOCS);
+    expect(getRoute(ROUTE_IDS.STATUS).path).toBe(PATHS.STATUS);
+  });
+
+  it("keeps placeholder brand routes noindex and out of the sitemap", () => {
+    for (const id of [
+      ROUTE_IDS.CAREERS,
+      ROUTE_IDS.BLOG,
+      ROUTE_IDS.DOCS,
+      ROUTE_IDS.STATUS,
+    ] as const) {
+      const route = getRoute(id);
+      expect(route.index).toBe(false);
+      expect(route.sitemap).toBe(false);
+      expect(route.follow).toBe(true);
+      expect(route.pageType).toBe("brand-static");
+    }
   });
 
   it("registers the Fileora hub as a product-hub route", () => {
@@ -598,11 +617,19 @@ describe("indexability helpers", () => {
   it("Task 9: in a recognized production environment with indexing enabled, effective indexable/sitemap routes from the real registry are exactly the already-approved non-tool routes — zero tools", () => {
     stubProductionEnabled();
 
-    // All non-tool ids (home, about, contact, security, privacy, terms,
-    // fileora-hub) were already declared index:true/sitemap:true in Task
-    // 2/pre-Task-9 — that "already-approved" set is untouched here. The
-    // Task 9 decision only concerns tools, and it approved zero.
-    const expectedIndexableIds = [...Object.values(ROUTE_IDS)].sort();
+    // Declared indexable non-tool ids (home, about, products, contact,
+    // security, privacy, terms, fileora-hub). Placeholder brand routes
+    // (careers/blog/docs/status) stay noindex. Task 9 approved zero tools.
+    const expectedIndexableIds = [
+      ROUTE_IDS.HOME,
+      ROUTE_IDS.ABOUT,
+      ROUTE_IDS.PRODUCTS,
+      ROUTE_IDS.CONTACT,
+      ROUTE_IDS.SECURITY,
+      ROUTE_IDS.PRIVACY,
+      ROUTE_IDS.TERMS,
+      ROUTE_IDS.FILEORA_HUB,
+    ].sort();
 
     const indexableIds = listIndexableRoutes()
       .map((route) => route.id)

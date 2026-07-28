@@ -1,7 +1,7 @@
 {
-  "name": "Fileora",
-  "short_name": "Fileora",
-  "description": "Free online file converter — images, PDFs & more",
+  "name": "ZolvStack",
+  "short_name": "ZolvStack",
+  "description": "Fast, private browser-based tools for everyday work — including Fileora, a free file converter.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#111318",

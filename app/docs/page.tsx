@@ -1,12 +1,8 @@
-import type { Metadata } from "next";
 import { ComingSoonPageContent } from "@/components/marketing/zolvstack/ComingSoonPageContent";
 import { ZolvStackPageShell } from "@/components/layout/ZolvStackPageShell";
+import { buildMetadataForRoute, ROUTE_IDS } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Documentation | ZolvStack",
-  description: "Documentation for ZolvStack products and developer resources.",
-  robots: { index: false, follow: true },
-};
+export const metadata = buildMetadataForRoute(ROUTE_IDS.DOCS);
 
 export default function DocsPage() {
   return (
