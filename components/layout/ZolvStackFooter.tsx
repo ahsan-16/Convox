@@ -53,7 +53,8 @@ export function ZolvStackFooter() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(min(100%, 180px), 1fr))",
             gap: 40,
             marginBottom: 40,
           }}
@@ -99,13 +100,10 @@ export function ZolvStackFooter() {
         </div>
 
         <div
+          className="flex flex-col items-center text-center gap-3 md:flex-row md:justify-between md:text-left"
           style={{
             borderTop: "1px solid var(--color-border)",
             paddingTop: 24,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
             gap: 12,
           }}
         >

@@ -10,10 +10,8 @@ export function ZolvStackHomeClient() {
     <ZolvStackPageShell mainPaddingTop={0}>
       <section
         style={{
-          paddingTop: 160,
-          paddingBottom: 100,
           textAlign: "center",
-          padding: "160px 24px 100px",
+          padding: "clamp(100px, 18vw, 160px) 24px clamp(64px, 12vw, 100px)",
           position: "relative",
         }}
       >
@@ -23,7 +21,7 @@ export function ZolvStackHomeClient() {
             top: 0,
             left: "50%",
             transform: "translateX(-50%)",
-            width: 800,
+            width: "min(800px, 100%)",
             height: 500,
             background:
               "radial-gradient(ellipse at center top, rgba(0,208,132,0.06) 0%, transparent 65%)",
@@ -54,7 +52,7 @@ export function ZolvStackHomeClient() {
             fontFamily: "var(--font-display)",
             fontSize: "clamp(42px, 7vw, 80px)",
             fontWeight: 800,
-            letterSpacing: "-3px",
+            letterSpacing: "clamp(-3px, -0.04em, -1px)",
             lineHeight: 1.03,
             marginBottom: 24,
             color: "#fff",
@@ -89,17 +87,16 @@ export function ZolvStackHomeClient() {
         </Link>
       </section>
 
-      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px 0" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-            gap: 16,
-            marginBottom: 48,
-            flexWrap: "wrap",
-          }}
-        >
+      <section
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: "40px 24px 0",
+          width: "100%",
+          boxSizing: "border-box",
+        }}
+      >
+        <div className="flex flex-col items-center text-center gap-4 mb-12 md:flex-row md:items-end md:justify-between md:text-left md:gap-4">
           <div>
             <p
               style={{
@@ -142,7 +139,8 @@ export function ZolvStackHomeClient() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
             gap: 20,
           }}
         >
