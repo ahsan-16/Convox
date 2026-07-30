@@ -32,13 +32,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           crossOrigin="anonymous"
           strategy="beforeInteractive"
         />
-        {/* <Script
+        <Script
     id="monetag-inpage-push"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(s){s.dataset.zone='11449977',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
           }}
-  /> */}
+  />
       </head>
       <body>
         {children}
