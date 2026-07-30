@@ -25,13 +25,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           fetchPriority="low"
         />
-        <Script
+          <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2722637490463810"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+        {/* <Script
     id="monetag-inpage-push"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(s){s.dataset.zone='11449977',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
           }}
-  />
+  /> */}
       </head>
       <body>
         {children}
