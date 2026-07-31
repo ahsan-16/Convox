@@ -140,7 +140,7 @@ export function ZolvStackHomeClient() {
           style={{
             display: "grid",
             gridTemplateColumns:
-              "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
+              "repeat(auto-fill, minmax(min(100%, 340px), 1fr))",
             gap: 20,
           }}
         >
