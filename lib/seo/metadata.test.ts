@@ -40,6 +40,34 @@ describe("buildRootMetadata", () => {
     expect(icons && typeof icons === "object" && "icon" in icons).toBe(true);
   });
 
+  it("declares Google-eligible favicon links (≥48px PNG + stable ICO first)", () => {
+    stubOrigin();
+    const metadata = buildRootMetadata();
+    const icons = metadata.icons;
+    expect(icons && typeof icons === "object" && "icon" in icons).toBe(true);
+    const iconList = (
+      icons as { icon: Array<{ url: string; sizes?: string; type?: string }> }
+    ).icon;
+
+    // Stable root ICO first (Googlebot also probes /favicon.ico by convention).
+    expect(iconList[0]).toMatchObject({ url: "/favicon.ico" });
+    // Explicit ≥48px PNG — Google recommends larger than 48x48 for SERP surfaces.
+    expect(iconList[1]).toMatchObject({
+      url: "/favicon-48.png",
+      sizes: "48x48",
+      type: "image/png",
+    });
+    expect(iconList).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          url: "/icons/icon-192.png",
+          sizes: "192x192",
+          type: "image/png",
+        }),
+      ]),
+    );
+  });
+
   it("keeps OG/Twitter titles as the plain final home title string", () => {
     stubOrigin();
     const metadata = buildRootMetadata();
