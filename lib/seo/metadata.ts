@@ -191,12 +191,18 @@ export function buildRootMetadata(): Metadata {
       default: finalTitle,
       template: `%s | ${ZOLVSTACK_BRAND.name}`,
     },
-    // Site-wide icons + PWA manifest (App Router metadata). Favicon.ico /
-    // SVG cover browsers; PNG icons cover PWA / Android; apple covers iOS
-    // home-screen. Keep paths stable under /public.
+    // Site-wide icons + PWA manifest (App Router metadata).
+    // Google Search: square ≥8px (recommend >48px), crawlable, stable URL.
+    // Lead with a real multi-size /favicon.ico, then an explicit 48×48 PNG.
+    // Keep paths stable under /public — do not change these URLs casually.
     icons: {
       icon: [
         { url: "/favicon.ico", sizes: "any" },
+        {
+          url: "/favicon-48.png",
+          sizes: "48x48",
+          type: "image/png",
+        },
         { url: "/favicon.svg", type: "image/svg+xml" },
         { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
         {
