@@ -16,6 +16,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
 } from "react";
 import {
@@ -36,6 +37,22 @@ import type { ToolSlug } from "@/lib/utils";
 
 const AUTO_ROTATE_MS = 3200;
 const CARD_SIZE = 118;
+/** Matches Fileora hub phone breakpoint in globals.css (<640px). */
+const MOBILE_MAX_WIDTH_PX = 639;
+
+function subscribeMaxWidth(maxWidthPx: number, onChange: () => void) {
+  const media = window.matchMedia(`(max-width: ${maxWidthPx}px)`);
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+
+function useIsMobileLayout(): boolean {
+  return useSyncExternalStore(
+    (onChange) => subscribeMaxWidth(MOBILE_MAX_WIDTH_PX, onChange),
+    () => window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH_PX}px)`).matches,
+    () => false,
+  );
+}
 
 function FormatIcon({
   value,
@@ -75,15 +92,15 @@ function FormatPickerDropdown({
   groups,
   value,
   disabledValue,
-  align = "start",
+  layout = "desktop",
   onSelect,
   onClose,
 }: {
   groups: FormatOptionGroup[];
   value: FormatValue;
   disabledValue: FormatValue;
-  /** Align panel under left (source) or right (target) card */
-  align?: "start" | "end";
+  /** Mobile: stacked chips + 2-col grid; desktop/tablet: sidebar + 3-col grid */
+  layout?: "desktop" | "mobile";
   onSelect: (value: FormatValue) => void;
   onClose: () => void;
 }) {
@@ -93,6 +110,7 @@ function FormatPickerDropdown({
   /** User pick only — effective category is derived (no setState-in-effect). */
   const [categoryOverride, setCategoryOverride] =
     useState<FormatCategoryId | null>(null);
+  const isMobile = layout === "mobile";
 
   const initialCategory = useMemo<FormatCategoryId>(() => {
     if (value !== "any") {
@@ -142,6 +160,81 @@ function FormatPickerDropdown({
 
   const visibleOptions: FormatOption[] = activeGroup?.options ?? [];
 
+  // Full-width under the From/To row on every breakpoint — never card-anchored,
+  // so panels cannot overflow the viewport on tablet/desktop split heroes.
+  const panelStyle: CSSProperties = {
+    position: "relative",
+    width: "100%",
+    maxWidth: "100%",
+    boxSizing: "border-box",
+    zIndex: 40,
+    borderRadius: 12,
+    overflow: "hidden",
+    background: "rgba(22, 26, 32, 0.97)",
+    border: "1px solid var(--color-border-hover)",
+    boxShadow:
+      "0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,208,132,0.06)",
+    backdropFilter: "blur(18px)",
+  };
+
+  const renderFormatButton = (option: FormatOption) => {
+    const isDisabled =
+      disabledValue !== "any" && option.value === disabledValue;
+    const isActive = value === option.value;
+    return (
+      <button
+        key={option.value}
+        type="button"
+        disabled={isDisabled}
+        onClick={() => {
+          if (isDisabled) return;
+          onSelect(option.value);
+          onClose();
+        }}
+        style={{
+          minHeight: isMobile ? 44 : 36,
+          minWidth: 0,
+          padding: isMobile ? "10px 8px" : "8px 6px",
+          borderRadius: 8,
+          border: isActive
+            ? "1px solid rgba(0, 208, 132, 0.55)"
+            : "1px solid var(--color-border)",
+          background: isActive
+            ? "rgba(0, 208, 132, 0.12)"
+            : "var(--color-bg-3)",
+          color: isDisabled
+            ? "var(--color-text-3)"
+            : isActive
+              ? "var(--color-brand)"
+              : "var(--color-text-1)",
+          fontFamily: "var(--font-display)",
+          fontWeight: 700,
+          fontSize: isMobile ? 12 : 11,
+          letterSpacing: "0.03em",
+          textTransform: "uppercase",
+          cursor: isDisabled ? "not-allowed" : "pointer",
+          opacity: isDisabled ? 0.45 : 1,
+          transition: "border-color 0.15s, background 0.15s, color 0.15s",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+        onMouseEnter={(e) => {
+          if (isDisabled || isActive) return;
+          e.currentTarget.style.borderColor = "var(--color-border-hover)";
+          e.currentTarget.style.background = "var(--color-bg-4)";
+        }}
+        onMouseLeave={(e) => {
+          if (isDisabled || isActive) return;
+          e.currentTarget.style.borderColor = "var(--color-border)";
+          e.currentTarget.style.background = "var(--color-bg-3)";
+        }}
+      >
+        {option.label}
+      </button>
+    );
+  };
+
   return (
     <motion.div
       ref={panelRef}
@@ -152,34 +245,25 @@ function FormatPickerDropdown({
       exit={{ opacity: 0, y: 4 }}
       transition={{ duration: 0.16, ease: "easeOut" }}
       onMouseDown={(e) => e.stopPropagation()}
-      style={{
-        position: "absolute",
-        top: "calc(100% + 8px)",
-        left: align === "start" ? 0 : "auto",
-        right: align === "end" ? 0 : "auto",
-        width: "min(360px, calc(100vw - 32px))",
-        zIndex: 40,
-        borderRadius: 12,
-        overflow: "hidden",
-        background: "rgba(22, 26, 32, 0.97)",
-        border: "1px solid var(--color-border-hover)",
-        boxShadow:
-          "0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,208,132,0.06)",
-        backdropFilter: "blur(18px)",
-        transformOrigin: align === "start" ? "top left" : "top right",
-      }}
+      style={panelStyle}
     >
-      {/* Search */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: 8,
-          padding: "9px 11px",
+          padding: isMobile ? "10px 12px" : "9px 11px",
+          minHeight: isMobile ? 44 : undefined,
           borderBottom: "1px solid var(--color-border)",
+          boxSizing: "border-box",
         }}
       >
-        <Search size={14} color="var(--color-text-3)" strokeWidth={2} />
+        <Search
+          size={14}
+          color="var(--color-text-3)"
+          strokeWidth={2}
+          style={{ flexShrink: 0 }}
+        />
         <input
           ref={searchRef}
           value={search}
@@ -188,187 +272,242 @@ function FormatPickerDropdown({
           aria-label="Search format"
           style={{
             flex: 1,
+            minWidth: 0,
             background: "transparent",
             border: "none",
             outline: "none",
             color: "var(--color-text-1)",
-            fontSize: 12.5,
+            fontSize: isMobile ? 14 : 12.5,
             fontFamily: "var(--font-body)",
             fontWeight: 500,
           }}
         />
       </div>
 
-      {/* Body: categories + grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "108px 1fr",
-          minHeight: 168,
-          maxHeight: 220,
-        }}
-      >
-        <aside
-          style={{
-            borderRight: "1px solid var(--color-border)",
-            padding: "6px 4px",
-            overflowY: "auto",
-            background: "rgba(17, 19, 24, 0.55)",
-          }}
-        >
-          {filteredGroups.length === 0 ? (
-            <p
-              style={{
-                fontSize: 11,
-                color: "var(--color-text-3)",
-                padding: "8px 8px",
-              }}
-            >
-              No matches
-            </p>
-          ) : (
-            filteredGroups.map((group) => {
-              const selected = group.id === activeCategory;
-              return (
-                <button
-                  key={group.id}
-                  type="button"
-                  onClick={() => setCategoryOverride(group.id)}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 6,
-                    padding: "8px 9px",
-                    marginBottom: 1,
-                    border: "none",
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    background: selected
-                      ? "rgba(0, 208, 132, 0.12)"
-                      : "transparent",
-                    color: selected
-                      ? "var(--color-brand)"
-                      : "var(--color-text-2)",
-                    fontFamily: "var(--font-display)",
-                    fontWeight: 600,
-                    fontSize: 12,
-                    letterSpacing: "0.01em",
-                    textAlign: "left",
-                    transition: "background 0.15s, color 0.15s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!selected) {
-                      e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-                      e.currentTarget.style.color = "var(--color-text-1)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!selected) {
-                      e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = "var(--color-text-2)";
-                    }
-                  }}
-                >
-                  <span>{group.label}</span>
-                  {selected && (
-                    <ChevronRight
-                      size={12}
-                      strokeWidth={2.2}
-                      color="var(--color-brand)"
-                    />
-                  )}
-                </button>
-              );
-            })
-          )}
-        </aside>
-
-        <div
-          style={{
-            padding: 8,
-            overflowY: "auto",
-            background: "var(--color-bg-2)",
-          }}
-        >
-          {visibleOptions.length === 0 ? (
-            <p
-              style={{
-                fontSize: 11,
-                color: "var(--color-text-3)",
-                padding: 8,
-                textAlign: "center",
-              }}
-            >
-              No formats in this category
-            </p>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                gap: 6,
-              }}
-            >
-              {visibleOptions.map((option) => {
-                const isDisabled =
-                  disabledValue !== "any" && option.value === disabledValue;
-                const isActive = value === option.value;
+      {isMobile ? (
+        <div style={{ background: "var(--color-bg-2)" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              padding: "10px 12px",
+              overflowX: "auto",
+              WebkitOverflowScrolling: "touch",
+              borderBottom: "1px solid var(--color-border)",
+              scrollbarWidth: "thin",
+            }}
+          >
+            {filteredGroups.length === 0 ? (
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "var(--color-text-3)",
+                  margin: 0,
+                  padding: "10px 0",
+                }}
+              >
+                No matches
+              </p>
+            ) : (
+              filteredGroups.map((group) => {
+                const selected = group.id === activeCategory;
                 return (
                   <button
-                    key={option.value}
+                    key={group.id}
                     type="button"
-                    disabled={isDisabled}
-                    onClick={() => {
-                      if (isDisabled) return;
-                      onSelect(option.value);
-                      onClose();
-                    }}
+                    onClick={() => setCategoryOverride(group.id)}
                     style={{
-                      minHeight: 30,
-                      padding: "5px 4px",
-                      borderRadius: 8,
-                      border: isActive
-                        ? "1px solid rgba(0, 208, 132, 0.55)"
+                      flex: "0 0 auto",
+                      minHeight: 44,
+                      padding: "0 14px",
+                      border: selected
+                        ? "1px solid rgba(0, 208, 132, 0.45)"
                         : "1px solid var(--color-border)",
-                      background: isActive
+                      borderRadius: 999,
+                      cursor: "pointer",
+                      background: selected
                         ? "rgba(0, 208, 132, 0.12)"
                         : "var(--color-bg-3)",
-                      color: isDisabled
-                        ? "var(--color-text-3)"
-                        : isActive
-                          ? "var(--color-brand)"
-                          : "var(--color-text-1)",
+                      color: selected
+                        ? "var(--color-brand)"
+                        : "var(--color-text-2)",
                       fontFamily: "var(--font-display)",
-                      fontWeight: 700,
-                      fontSize: 11,
-                      letterSpacing: "0.03em",
-                      textTransform: "uppercase",
-                      cursor: isDisabled ? "not-allowed" : "pointer",
-                      opacity: isDisabled ? 0.45 : 1,
-                      transition: "border-color 0.15s, background 0.15s, color 0.15s",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (isDisabled || isActive) return;
-                      e.currentTarget.style.borderColor =
-                        "var(--color-border-hover)";
-                      e.currentTarget.style.background = "var(--color-bg-4)";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (isDisabled || isActive) return;
-                      e.currentTarget.style.borderColor = "var(--color-border)";
-                      e.currentTarget.style.background = "var(--color-bg-3)";
+                      fontWeight: 600,
+                      fontSize: 13,
+                      letterSpacing: "0.01em",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    {option.label}
+                    {group.label}
                   </button>
                 );
-              })}
-            </div>
-          )}
+              })
+            )}
+          </div>
+
+          <div
+            style={{
+              padding: 12,
+              maxHeight: "min(280px, 45vh)",
+              overflowY: "auto",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {visibleOptions.length === 0 ? (
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "var(--color-text-3)",
+                  padding: 12,
+                  textAlign: "center",
+                  margin: 0,
+                }}
+              >
+                No formats in this category
+              </p>
+            ) : (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                  gap: 8,
+                }}
+              >
+                {visibleOptions.map(renderFormatButton)}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "minmax(96px, 112px) minmax(0, 1fr)",
+            minHeight: 180,
+            maxHeight: "min(280px, 50vh)",
+          }}
+        >
+          <aside
+            style={{
+              borderRight: "1px solid var(--color-border)",
+              padding: "6px 4px",
+              overflowY: "auto",
+              background: "rgba(17, 19, 24, 0.55)",
+            }}
+          >
+            {filteredGroups.length === 0 ? (
+              <p
+                style={{
+                  fontSize: 11,
+                  color: "var(--color-text-3)",
+                  padding: "8px 8px",
+                }}
+              >
+                No matches
+              </p>
+            ) : (
+              filteredGroups.map((group) => {
+                const selected = group.id === activeCategory;
+                return (
+                  <button
+                    key={group.id}
+                    type="button"
+                    onClick={() => setCategoryOverride(group.id)}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 6,
+                      minHeight: 40,
+                      padding: "8px 9px",
+                      marginBottom: 1,
+                      border: "none",
+                      borderRadius: 8,
+                      cursor: "pointer",
+                      background: selected
+                        ? "rgba(0, 208, 132, 0.12)"
+                        : "transparent",
+                      color: selected
+                        ? "var(--color-brand)"
+                        : "var(--color-text-2)",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 600,
+                      fontSize: 12,
+                      letterSpacing: "0.01em",
+                      textAlign: "left",
+                      transition: "background 0.15s, color 0.15s",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!selected) {
+                        e.currentTarget.style.background =
+                          "rgba(255,255,255,0.04)";
+                        e.currentTarget.style.color = "var(--color-text-1)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!selected) {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.color = "var(--color-text-2)";
+                      }
+                    }}
+                  >
+                    <span
+                      style={{
+                        minWidth: 0,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {group.label}
+                    </span>
+                    {selected && (
+                      <ChevronRight
+                        size={12}
+                        strokeWidth={2.2}
+                        color="var(--color-brand)"
+                        style={{ flexShrink: 0 }}
+                      />
+                    )}
+                  </button>
+                );
+              })
+            )}
+          </aside>
+
+          <div
+            style={{
+              padding: 8,
+              overflowY: "auto",
+              background: "var(--color-bg-2)",
+            }}
+          >
+            {visibleOptions.length === 0 ? (
+              <p
+                style={{
+                  fontSize: 11,
+                  color: "var(--color-text-3)",
+                  padding: 8,
+                  textAlign: "center",
+                }}
+              >
+                No formats in this category
+              </p>
+            ) : (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                  gap: 6,
+                }}
+              >
+                {visibleOptions.map(renderFormatButton)}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -411,6 +550,7 @@ function FormatCard({
     padding: 0,
     font: "inherit",
     color: "inherit",
+    overflow: "hidden",
   };
 
   return (
@@ -444,6 +584,10 @@ function FormatCard({
             flexDirection: "column",
             alignItems: "center",
             gap: 10,
+            width: "100%",
+            padding: "0 14px",
+            boxSizing: "border-box",
+            minWidth: 0,
           }}
         >
           <FormatIcon value={value} accent={highlighted || open} />
@@ -459,6 +603,10 @@ function FormatCard({
                   ? "var(--color-brand)"
                   : "var(--color-text-1)",
               textTransform: "uppercase",
+              maxWidth: "100%",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
             }}
           >
             {formatDisplayLabel(value)}
@@ -479,6 +627,7 @@ function FormatCard({
           right: 12,
           bottom: 10,
           pointerEvents: "none",
+          flexShrink: 0,
         }}
       />
     </motion.button>
@@ -506,6 +655,7 @@ export function HeroConversionGraphic({
   const [openSide, setOpenSide] = useState<"source" | "target" | null>(null);
   const pairIndexRef = useRef(0);
   const rootRef = useRef<HTMLDivElement>(null);
+  const isMobileLayout = useIsMobileLayout();
 
   const pickerOpen = openSide !== null;
   const shouldAutoRotate = !autoRotateStopped && !isHovered && !pickerOpen;
@@ -537,7 +687,7 @@ export function HeroConversionGraphic({
 
   useEffect(() => {
     if (!pickerOpen) return;
-    const onPointerDown = (event: MouseEvent) => {
+    const onPointerDown = (event: PointerEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) {
         setOpenSide(null);
       }
@@ -545,10 +695,10 @@ export function HeroConversionGraphic({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpenSide(null);
     };
-    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [pickerOpen]);
@@ -643,6 +793,8 @@ export function HeroConversionGraphic({
         alignItems: "center",
         justifyContent: "flex-start",
         overflow: "visible",
+        minWidth: 0,
+        boxSizing: "border-box",
       }}
     >
       <div
@@ -667,8 +819,12 @@ export function HeroConversionGraphic({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 16,
+          gap: isMobileLayout ? 12 : 16,
           zIndex: 2,
+          width: "100%",
+          maxWidth: "100%",
+          minWidth: 0,
+          boxSizing: "border-box",
         }}
       >
         <div
@@ -686,19 +842,6 @@ export function HeroConversionGraphic({
               setOpenSide(next ? "source" : null);
             }}
           />
-          <AnimatePresence>
-            {openSide === "source" && (
-              <FormatPickerDropdown
-                key="source-picker"
-                groups={sourceGroups}
-                value={source}
-                disabledValue={activeTarget}
-                align="start"
-                onSelect={handleSourceChange}
-                onClose={closePicker}
-              />
-            )}
-          </AnimatePresence>
         </div>
 
         <div
@@ -720,8 +863,8 @@ export function HeroConversionGraphic({
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.94 }}
             style={{
-              width: 36,
-              height: 36,
+              width: isMobileLayout ? 44 : 36,
+              height: isMobileLayout ? 44 : 36,
               borderRadius: "999px",
               border: "1px solid var(--color-border)",
               background: "var(--color-bg-2)",
@@ -763,20 +906,43 @@ export function HeroConversionGraphic({
               setOpenSide(next ? "target" : null);
             }}
           />
-          <AnimatePresence>
-            {openSide === "target" && (
-              <FormatPickerDropdown
-                key="target-picker"
-                groups={targetGroups}
-                value={activeTarget}
-                disabledValue={source}
-                align="start"
-                onSelect={handleTargetChange}
-                onClose={closePicker}
-              />
-            )}
-          </AnimatePresence>
         </div>
+      </div>
+
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "100%",
+          marginTop: 12,
+          minWidth: 0,
+          boxSizing: "border-box",
+          zIndex: 3,
+        }}
+      >
+        <AnimatePresence>
+          {openSide === "source" && (
+            <FormatPickerDropdown
+              key="source-picker"
+              groups={sourceGroups}
+              value={source}
+              disabledValue={activeTarget}
+              layout={isMobileLayout ? "mobile" : "desktop"}
+              onSelect={handleSourceChange}
+              onClose={closePicker}
+            />
+          )}
+          {openSide === "target" && (
+            <FormatPickerDropdown
+              key="target-picker"
+              groups={targetGroups}
+              value={activeTarget}
+              disabledValue={source}
+              layout={isMobileLayout ? "mobile" : "desktop"}
+              onSelect={handleTargetChange}
+              onClose={closePicker}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
       <span
