@@ -35,7 +35,8 @@ describe("App Router metadata migration", () => {
       default: expect.stringContaining("ZolvStack"),
       template: expect.stringContaining("ZolvStack"),
     });
-    expect(JSON.stringify(rootLayoutModule.metadata.title)).not.toContain(
+    // Phase 1 SEO: root title intentionally names Fileora + converter intents.
+    expect(JSON.stringify(rootLayoutModule.metadata.title)).toContain(
       "Fileora",
     );
     expect(rootSource).not.toContain("application/ld+json");

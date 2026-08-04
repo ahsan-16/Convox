@@ -35,6 +35,7 @@
  */
 
 import { FILEORA_FAQS } from "../fileora-faq";
+import { getFileoraToolContent } from "../fileora-tool-content";
 import { FILEORA_BASE, TOOL_CONFIG, toolHref, type ToolSlug } from "../utils";
 
 import { brandHomeTitle, brandStaticTitle, productHubTitle } from "./brands";
@@ -194,7 +195,7 @@ const BRAND_ROUTES: readonly SeoRoute[] = [
     pageType: "brand-home",
     title: brandHomeTitle(),
     description:
-      "ZolvStack builds fast, private, browser-based tools for everyday work — starting with Fileora, a free file converter.",
+      "ZolvStack builds Fileora — a free online file converter for images, PDFs, and documents. Fast, private image and PDF conversion with no signup or watermarks.",
     index: true,
     sitemap: true,
     follow: true,
@@ -329,7 +330,7 @@ const FILEORA_HUB_ROUTE: SeoRoute = {
   pageType: "product-hub",
   title: productHubTitle(),
   description:
-    "Fileora by ZolvStack — free, unlimited file conversion tools for images, PDFs, and documents. No signup required.",
+    "Convert images, PDFs, and documents free with Fileora by ZolvStack. Online file converter, image converter, and PDF tools — unlimited, private, no signup.",
   faq: [...FILEORA_FAQS],
   index: true,
   sitemap: true,
@@ -339,12 +340,22 @@ const FILEORA_HUB_ROUTE: SeoRoute = {
 };
 
 function buildToolRoute(slug: ToolSlug): SeoRoute {
+  const content = getFileoraToolContent(slug);
   return {
     id: slug,
     path: toolHref(slug),
     product: "fileora",
     pageType: "product-tool",
     ...TOOL_ROUTE_DEFAULTS,
+    ...(content?.h1 ? { title: content.h1 } : {}),
+    ...(content?.faqs?.length
+      ? {
+          faq: content.faqs.map(({ question, answer }) => ({
+            question,
+            answer,
+          })),
+        }
+      : {}),
   };
 }
 

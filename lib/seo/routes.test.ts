@@ -2,6 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TOOL_CONFIG, toolHref, type ToolSlug } from "@/lib/utils";
 
+import {
+  getFileoraToolContent,
+  WAVE_1_TOOL_SLUGS,
+} from "../fileora-tool-content";
 import { getNextRedirects, getRedirects, assertValidRedirects } from "./redirects";
 import type { RedirectRule } from "./redirects";
 import {
@@ -112,6 +116,26 @@ describe("ROUTES registry", () => {
       expect(route.sitemap).toBe(false);
       expect(route.follow).toBe(true);
     }
+  });
+
+  it("attaches authored FAQs and intent titles for Wave-1 tools only", () => {
+    for (const slug of WAVE_1_TOOL_SLUGS) {
+      const content = getFileoraToolContent(slug);
+      expect(content).toBeDefined();
+      const route = getRoute(slug);
+      expect(route.title).toBe(content!.h1);
+      expect(route.faq).toEqual(
+        content!.faqs.map(({ question, answer }) => ({ question, answer })),
+      );
+      expect(route.index).toBe(false);
+      expect(route.sitemap).toBe(false);
+    }
+
+    const withoutContent = getRoute("pdf-split");
+    expect(getFileoraToolContent("pdf-split")).toBeUndefined();
+    expect(withoutContent.faq).toBeUndefined();
+    expect(withoutContent.index).toBe(false);
+    expect(withoutContent.sitemap).toBe(false);
   });
 
   it("Task 9 initial indexing policy: declares Home and the Fileora hub indexable/sitemap-enabled while every product-tool stays index:false/sitemap:false/follow:true", () => {
