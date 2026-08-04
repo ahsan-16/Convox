@@ -103,9 +103,17 @@ describe("buildRootMetadata", () => {
     );
   });
 
-  it("does not set keywords when a route has none configured", () => {
+  it("sets brand association keywords on about when authored", () => {
     stubOrigin();
     const metadata = buildMetadataForRoute("about");
+    expect(metadata.keywords).toEqual(
+      expect.arrayContaining(["zolvstack", "zolv-stack", "fileora"]),
+    );
+  });
+
+  it("does not set keywords when a route has none configured", () => {
+    stubOrigin();
+    const metadata = buildMetadataForRoute("contact");
     expect(metadata.keywords).toBeUndefined();
   });
 });

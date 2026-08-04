@@ -168,10 +168,10 @@ describe("buildJsonLdForRoute — brand home", () => {
     expect(org?.name).toBe("ZolvStack");
     expect(org?.["@id"]).toBe(organizationId());
     expect(org?.alternateName).toEqual(
-      expect.arrayContaining(["zolvstack", "zolv-stack"]),
+      expect.arrayContaining(["zolvstack", "zolv-stack", "Zolvstack"]),
     );
     expect(org?.knowsAbout).toEqual(
-      expect.arrayContaining(["Fileora", "file conversion"]),
+      expect.arrayContaining(["Fileora", "file conversion", "Fileora by ZolvStack"]),
     );
     expect(org).not.toHaveProperty("aggregateRating");
   });
@@ -318,7 +318,12 @@ describe("buildJsonLdForRoute — Fileora hub (product-hub -> CollectionPage)", 
     expect(webApp?.name).toBe("Fileora");
     expect(webApp?.["@id"]).toBe(fileoraWebApplicationId());
     expect(webApp?.alternateName).toEqual(
-      expect.arrayContaining(["Fileora by ZolvStack", "Fileora Converter"]),
+      expect.arrayContaining([
+        "Fileora by ZolvStack",
+        "Fileora Converter",
+        "Fileora ZolvStack",
+        "ZolvStack Fileora",
+      ]),
     );
     expect(webApp?.applicationSubCategory).toBe("File converter");
     expect(webApp?.featureList).toEqual(

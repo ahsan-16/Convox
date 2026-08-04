@@ -22,7 +22,7 @@ export function buildWebsiteNode(): JsonLdNode {
     "@type": "WebSite",
     "@id": websiteId(),
     name: ZOLVSTACK_BRAND.name,
-    alternateName: ["zolvstack", "zolv-stack"],
+    alternateName: ["zolvstack", "zolv-stack", "Zolvstack"],
     url: absoluteUrl(PATHS.HOME),
     publisher: buildOrganizationRef(),
     inLanguage: "en",

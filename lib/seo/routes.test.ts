@@ -183,7 +183,28 @@ describe("ROUTES registry", () => {
       expect(hub.title).toBe("Fileora — Free File Converter by ZolvStack");
       expect(hub.description).toMatch(/Fileora is ZolvStack/i);
       expect(hub.keywords).toEqual(
-        expect.arrayContaining(["fileora", "free file converter"]),
+        expect.arrayContaining([
+          "fileora",
+          "free file converter",
+          "zolvstack",
+          "fileora by zolvstack",
+        ]),
+      );
+    });
+
+    it("authors unhyphenated zolvstack brand keywords on core brand routes", () => {
+      const home = getRoute(ROUTE_IDS.HOME);
+      const products = getRoute(ROUTE_IDS.PRODUCTS);
+      const about = getRoute(ROUTE_IDS.ABOUT);
+
+      expect(home.keywords).toEqual(
+        expect.arrayContaining(["zolvstack", "zolv-stack", "zolvstack fileora"]),
+      );
+      expect(products.keywords).toEqual(
+        expect.arrayContaining(["zolvstack", "zolv-stack", "fileora by zolvstack"]),
+      );
+      expect(about.keywords).toEqual(
+        expect.arrayContaining(["zolvstack", "zolv-stack"]),
       );
     });
   });
