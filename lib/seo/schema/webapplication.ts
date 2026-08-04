@@ -44,12 +44,26 @@ export function buildFileoraWebApplicationNode(): JsonLdNode {
     "@type": "WebApplication",
     "@id": fileoraWebApplicationId(),
     name: FILEORA_BRAND.name,
+    alternateName: [
+      "Fileora by ZolvStack",
+      "Fileora Converter",
+      "Fileora File Converter",
+    ],
     url: absoluteUrl(PATHS.FILEORA),
     description: resolveRouteDescription(hubRoute),
     applicationCategory: FILE_TOOL_APPLICATION_CATEGORY,
+    applicationSubCategory: "File converter",
     operatingSystem: "Web",
     offers: buildFreeOffer(),
     provider: buildOrganizationRef(),
+    brand: { "@type": "Brand", name: FILEORA_BRAND.name },
+    featureList: [
+      "Image conversion",
+      "PDF tools",
+      "Document conversion",
+      "Browser-based processing",
+      "No signup required",
+    ],
     inLanguage: "en",
   };
 }

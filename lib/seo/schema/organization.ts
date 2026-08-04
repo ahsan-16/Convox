@@ -28,7 +28,7 @@ const LOGO_HEIGHT = 512;
 /** Organization description — mirrors the home route SEO description for
  * brand-entity clarity (helps disambiguate near-names like Zolve/Zolv). */
 const ORGANIZATION_DESCRIPTION =
-  "ZolvStack builds fast, private, browser-based tools for everyday work — starting with Fileora, a free file converter.";
+  "ZolvStack builds fast, private, browser-based tools for everyday work — starting with Fileora, a free file converter for images, PDFs, and documents.";
 
 /**
  * Official profile / social URLs for `Organization.sameAs`.
@@ -50,9 +50,17 @@ export function buildOrganizationNode(): JsonLdNode {
     "@type": "Organization",
     "@id": organizationId(),
     name: ZOLVSTACK_BRAND.name,
+    alternateName: ["Zolv Stack", "zolv-stack", "zolvstack"],
     url: absoluteUrl(PATHS.HOME),
     logo: ref(logoImageId()),
     description: ORGANIZATION_DESCRIPTION,
+    knowsAbout: [
+      "file conversion",
+      "image conversion",
+      "document conversion",
+      "PDF tools",
+      "Fileora",
+    ],
     sameAs: [...ORGANIZATION_SAME_AS],
   };
 }

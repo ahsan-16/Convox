@@ -101,17 +101,41 @@ NEXT_PUBLIC_APP_URL=https://<production-origin> npm run build
 
 ## Current indexing scope (see `lib/seo/routes.ts` for the live source of truth)
 
-As of this runbook, the non-tool routes with already-approved `index: true` /
-`sitemap: true` declarations are Home, the Fileora hub, About, Contact,
-Security, Privacy, and Terms. Every Fileora tool route stays `index: false` /
-`sitemap: false` (Task 9's index quality gate approved zero tools initially —
-see the comment above `TOOL_ROUTE_DEFAULTS` in `lib/seo/routes.ts`). Do not
-submit an individual tool URL for indexing in GSC/Bing until its route is
-flipped to `index: true` in the registry and redeployed.
+As of Fileora brand SEO Phase 1, the routes with `index: true` / `sitemap: true`
+declarations are:
+
+- Brand / product: Home (`/`), Products (`/products`), Fileora hub (`/fileora`),
+  About, Contact, Security, Privacy, Terms
+- Priority Fileora tools: `/fileora/image-to-webp`, `/fileora/image-to-jpg`,
+  `/fileora/image-to-png`, `/fileora/pdf-compress`
+
+All other Fileora tool routes stay `index: false` / `sitemap: false` until they
+pass the index quality gate and receive an explicit registry override. Effective
+indexing still requires production `NODE_ENV`, a valid `NEXT_PUBLIC_APP_URL`, and
+`SEO_INDEXING_ENABLED=true`.
+
+### Fileora brand Phase 1 — GSC URL Inspection priority
+
+After a production deploy with indexing enabled, request indexing in this order:
+
+1. `/fileora` (Fileora brand entity — highest priority)
+2. `/` (ZolvStack parent brand)
+3. `/fileora/image-to-webp` (WebP keyword cluster)
+4. `/products`
+5. `/fileora/image-to-jpg`
+6. `/fileora/image-to-png`
+7. `/fileora/pdf-compress`
+
+Also confirm `/sitemap.xml` lists these URLs, then monitor Performance for queries
+`fileora`, `zolvstack`, `fileora converter`, and `image to webp converter`.
+
+Do not submit non-opted-in tool URLs for indexing until their registry flags flip
+and a redeploy ships.
 
 ## Related
 
 - `docs/seo/url-policy.md` — canonical URL contract
 - `docs/seo/rollback.md` — safe rollback of indexing/verification/env
 - `docs/seo/performance-budgets.md` — CWV budgets that affect crawl/ranking signals
+- `docs/superpowers/specs/2026-08-04-fileora-brand-seo-ranking-design.md` — Phase 1 design
 - `lib/seo/config.ts`, `lib/seo/metadata.ts`, `lib/seo/verification.ts` — implementation

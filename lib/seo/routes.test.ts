@@ -104,9 +104,16 @@ describe("ROUTES registry", () => {
     }
   });
 
-  it("defaults every tool route to index:false, sitemap:false, follow:true", () => {
+  it("defaults non-priority tool routes to index:false, sitemap:false, follow:true", () => {
+    const priority = new Set([
+      "image-to-webp",
+      "image-to-jpg",
+      "image-to-png",
+      "pdf-compress",
+    ]);
     const toolSlugs = Object.keys(TOOL_CONFIG) as ToolSlug[];
     for (const slug of toolSlugs) {
+      if (priority.has(slug)) continue;
       const route = getRoute(slug);
       expect(route.index).toBe(false);
       expect(route.sitemap).toBe(false);
@@ -114,12 +121,7 @@ describe("ROUTES registry", () => {
     }
   });
 
-  it("Task 9 initial indexing policy: declares Home and the Fileora hub indexable/sitemap-enabled while every product-tool stays index:false/sitemap:false/follow:true", () => {
-    // Regression guard for the Task 9 approved decision: after a codebase
-    // audit, zero tools had both substantial unique content and
-    // converter smoke-test evidence, so the initial indexable tool
-    // allowlist is empty. Home and the Fileora hub retain their
-    // already-approved (pre-Task-9) index/sitemap declarations.
+  it("keeps Home and Fileora hub indexable while non-priority tools stay noindex", () => {
     const home = getRoute(ROUTE_IDS.HOME);
     expect(home.index).toBe(true);
     expect(home.sitemap).toBe(true);
@@ -128,15 +130,62 @@ describe("ROUTES registry", () => {
     expect(hub.index).toBe(true);
     expect(hub.sitemap).toBe(true);
 
+    const priority = new Set([
+      "image-to-webp",
+      "image-to-jpg",
+      "image-to-png",
+      "pdf-compress",
+    ]);
     const toolSlugs = Object.keys(TOOL_CONFIG) as ToolSlug[];
     expect(toolSlugs.length).toBeGreaterThan(0);
     for (const slug of toolSlugs) {
       const route = getRoute(slug);
       expect(route.pageType).toBe("product-tool");
+      expect(route.follow).toBe(true);
+      if (priority.has(slug)) {
+        expect(route.index).toBe(true);
+        expect(route.sitemap).toBe(true);
+      } else {
+        expect(route.index).toBe(false);
+        expect(route.sitemap).toBe(false);
+      }
+    }
+  });
+
+  describe("phase-1 Fileora brand SEO routes", () => {
+    const PRIORITY_TOOLS = [
+      "image-to-webp",
+      "image-to-jpg",
+      "image-to-png",
+      "pdf-compress",
+    ] as const;
+
+    it("opts priority tools into index + sitemap", () => {
+      for (const id of PRIORITY_TOOLS) {
+        const route = getRoute(id);
+        expect(route.index).toBe(true);
+        expect(route.sitemap).toBe(true);
+        expect(route.follow).toBe(true);
+        expect(route.title).toBeTruthy();
+        expect(route.description).toBeTruthy();
+        expect(route.keywords?.length).toBeGreaterThan(0);
+      }
+    });
+
+    it("keeps a non-priority tool noindex and out of sitemap", () => {
+      const route = getRoute("image-to-avif");
       expect(route.index).toBe(false);
       expect(route.sitemap).toBe(false);
-      expect(route.follow).toBe(true);
-    }
+    });
+
+    it("authors Fileora hub brand metadata", () => {
+      const hub = getRoute(ROUTE_IDS.FILEORA_HUB);
+      expect(hub.title).toBe("Fileora — Free File Converter by ZolvStack");
+      expect(hub.description).toMatch(/Fileora is ZolvStack/i);
+      expect(hub.keywords).toEqual(
+        expect.arrayContaining(["fileora", "free file converter"]),
+      );
+    });
   });
 
   it("has unique route ids", () => {
@@ -614,12 +663,9 @@ describe("indexability helpers", () => {
     }
   });
 
-  it("Task 9: in a recognized production environment with indexing enabled, effective indexable/sitemap routes from the real registry are exactly the already-approved non-tool routes — zero tools", () => {
+  it("phase-1: with indexing enabled, effective indexable/sitemap routes include approved brand routes plus priority tools", () => {
     stubProductionEnabled();
 
-    // Declared indexable non-tool ids (home, about, products, contact,
-    // security, privacy, terms, fileora-hub). Placeholder brand routes
-    // (careers/blog/docs/status) stay noindex. Task 9 approved zero tools.
     const expectedIndexableIds = [
       ROUTE_IDS.HOME,
       ROUTE_IDS.ABOUT,
@@ -629,6 +675,10 @@ describe("indexability helpers", () => {
       ROUTE_IDS.PRIVACY,
       ROUTE_IDS.TERMS,
       ROUTE_IDS.FILEORA_HUB,
+      "image-to-webp",
+      "image-to-jpg",
+      "image-to-png",
+      "pdf-compress",
     ].sort();
 
     const indexableIds = listIndexableRoutes()
@@ -641,10 +691,17 @@ describe("indexability helpers", () => {
     expect(indexableIds).toEqual(expectedIndexableIds);
     expect(sitemapIds).toEqual(expectedIndexableIds);
 
-    // No product-tool route ever appears in either effective list.
-    const toolSlugs = new Set(Object.keys(TOOL_CONFIG) as ToolSlug[]);
-    for (const id of indexableIds) {
-      expect(toolSlugs.has(id as ToolSlug)).toBe(false);
+    const nonPriorityTools = (Object.keys(TOOL_CONFIG) as ToolSlug[]).filter(
+      (slug) =>
+        ![
+          "image-to-webp",
+          "image-to-jpg",
+          "image-to-png",
+          "pdf-compress",
+        ].includes(slug),
+    );
+    for (const slug of nonPriorityTools) {
+      expect(indexableIds).not.toContain(slug);
     }
   });
 });

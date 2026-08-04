@@ -161,6 +161,34 @@ describe("buildJsonLdForRoute — brand home", () => {
     expect(asRef(webPage?.isPartOf)).toBe(websiteId());
   });
 
+  it("enriches Organization with alternateName and knowsAbout", () => {
+    stubOrigin();
+    const graph = buildJsonLdForRoute(ROUTE_IDS.HOME);
+    const org = findNode(graph, "Organization");
+    expect(org?.name).toBe("ZolvStack");
+    expect(org?.["@id"]).toBe(organizationId());
+    expect(org?.alternateName).toEqual(
+      expect.arrayContaining(["zolvstack", "zolv-stack"]),
+    );
+    expect(org?.knowsAbout).toEqual(
+      expect.arrayContaining(["Fileora", "file conversion"]),
+    );
+    expect(org).not.toHaveProperty("aggregateRating");
+  });
+
+  it("enriches WebSite with alternateName while keeping publisher as Organization", () => {
+    stubOrigin();
+    const graph = buildJsonLdForRoute(ROUTE_IDS.HOME);
+    const website = findNode(graph, "WebSite");
+    expect(website?.name).toBe("ZolvStack");
+    expect(website?.["@id"]).toBe(websiteId());
+    expect(website?.alternateName).toEqual(
+      expect.arrayContaining(["zolvstack", "zolv-stack"]),
+    );
+    expect(asRef(website?.publisher)).toBe(organizationId());
+    expect(website).not.toHaveProperty("potentialAction");
+  });
+
   it("never emits a BreadcrumbList for the home page", () => {
     stubOrigin();
     const graph = buildJsonLdForRoute(ROUTE_IDS.HOME);
@@ -283,6 +311,29 @@ describe("buildJsonLdForRoute — Fileora hub (product-hub -> CollectionPage)", 
     expect(webApp).not.toHaveProperty("review");
   });
 
+  it("enriches Fileora WebApplication as the product brand entity", () => {
+    stubOrigin();
+    const graph = buildJsonLdForRoute(ROUTE_IDS.FILEORA_HUB);
+    const webApp = findNode(graph, "WebApplication");
+    expect(webApp?.name).toBe("Fileora");
+    expect(webApp?.["@id"]).toBe(fileoraWebApplicationId());
+    expect(webApp?.alternateName).toEqual(
+      expect.arrayContaining(["Fileora by ZolvStack", "Fileora Converter"]),
+    );
+    expect(webApp?.applicationSubCategory).toBe("File converter");
+    expect(webApp?.featureList).toEqual(
+      expect.arrayContaining(["Image conversion", "PDF tools"]),
+    );
+    expect(webApp?.brand).toMatchObject({
+      "@type": "Brand",
+      name: "Fileora",
+    });
+    expect(asRef(webApp?.provider)).toBe(organizationId());
+    expect(webApp).not.toHaveProperty("aggregateRating");
+    expect(webApp).not.toHaveProperty("review");
+    expect(webApp).not.toHaveProperty("sameAs");
+  });
+
   it("emits the hub's eight route-authored FAQs in the centralized graph", () => {
     stubOrigin();
     const route = ROUTES.find((entry) => entry.id === ROUTE_IDS.FILEORA_HUB);
@@ -393,16 +444,16 @@ describe("buildJsonLdForRoute — product tool", () => {
     const graph = buildJsonLdForRoute("image-to-webp");
     const softwareApp = findNode(graph, "SoftwareApplication");
     expect(softwareApp?.name).toBe(
-      "Image to WebP Converter | Fileora by ZolvStack",
+      "Image to WebP Converter — JPG & PNG to WebP | Fileora by ZolvStack",
     );
   });
 
-  it("still returns full, accurate schema for a route that is currently noindex", () => {
+  it("still returns full, accurate schema for a noindex tool route", () => {
     stubOrigin();
-    const route = ROUTES.find((r) => r.id === "image-to-webp");
+    const route = ROUTES.find((r) => r.id === "image-to-avif");
     expect(route?.index).toBe(false);
 
-    const graph = buildJsonLdForRoute("image-to-webp");
+    const graph = buildJsonLdForRoute("image-to-avif");
     expect(findNode(graph, "WebPage")).toBeTruthy();
     expect(findNode(graph, "SoftwareApplication")).toBeTruthy();
   });

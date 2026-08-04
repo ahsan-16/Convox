@@ -37,7 +37,7 @@
 import { FILEORA_FAQS } from "../fileora-faq";
 import { FILEORA_BASE, TOOL_CONFIG, toolHref, type ToolSlug } from "../utils";
 
-import { brandHomeTitle, brandStaticTitle, productHubTitle } from "./brands";
+import { brandHomeTitle, brandStaticTitle } from "./brands";
 import type { IndexFlags, SeoRoute } from "./types";
 
 /** Stable ids for non-tool routes. Tool routes use their `ToolSlug` as the
@@ -162,25 +162,16 @@ export function assertValidRoutes(routes: readonly SeoRoute[]): void {
  * `index: false`, `sitemap: false` until quality gate passes"). Fail-closed
  * effective indexing still requires production + `SEO_INDEXING_ENABLED`.
  *
- * ## Task 9 initial policy decision
+ * ## Phase-1 Fileora brand SEO policy
  *
- * Task 9's index-quality-gate audit reviewed every current tool and
- * approved **zero** for indexing: no tool had both substantial unique page
- * content and converter smoke-test evidence at review time, and some also
- * carried placeholder, binary-dependency, or functional risk. Per the
- * gate's rule — "absence of evidence means exclude" — every `ToolSlug`
- * below keeps {@link TOOL_ROUTE_DEFAULTS} unchanged rather than gaining a
- * per-route override.
- *
- * This is a conservative *initial* decision, not a permanent one. A tool
- * becomes indexable only by individually satisfying the full index quality
- * gate above (fully functional, unique substantial content, correct
- * metadata/schema, crawlable internal links, passing content/converter
- * smoke tests) and then flipping its own `index`/`sitemap` flags to `true`
- * — future opt-in is a per-route change here, not a new abstraction. There
- * is deliberately no separate "allowlist" data structure to keep in sync:
- * this registry is already the single source of truth for tool indexing
- * intent. */
+ * Task 9 initially approved **zero** tools for indexing. Phase 1 of
+ * Fileora brand SEO ranking growth opts in a small priority set via
+ * {@link PRIORITY_TOOL_OVERRIDES} (image-to-webp, image-to-jpg,
+ * image-to-png, pdf-compress) after authored metadata. All other
+ * `ToolSlug`s keep {@link TOOL_ROUTE_DEFAULTS}. A tool becomes indexable
+ * only by individually satisfying the index quality gate and gaining an
+ * explicit override here — there is deliberately no separate allowlist.
+ */
 const TOOL_ROUTE_DEFAULTS: IndexFlags = {
   index: false,
   sitemap: false,
@@ -194,7 +185,14 @@ const BRAND_ROUTES: readonly SeoRoute[] = [
     pageType: "brand-home",
     title: brandHomeTitle(),
     description:
-      "ZolvStack builds fast, private, browser-based tools for everyday work — starting with Fileora, a free file converter.",
+      "ZolvStack builds fast, private, browser-based tools for everyday work — starting with Fileora, a free file converter for images, PDFs, and documents.",
+    keywords: [
+      "zolvstack",
+      "zolv-stack",
+      "zolvstack tools",
+      "fileora",
+      "file converter",
+    ],
     index: true,
     sitemap: true,
     follow: true,
@@ -220,7 +218,8 @@ const BRAND_ROUTES: readonly SeoRoute[] = [
     pageType: "brand-static",
     title: brandStaticTitle("Products"),
     description:
-      "Explore ZolvStack products, including Fileora — free file conversion for images, PDFs, and documents.",
+      "Explore ZolvStack products, including Fileora — a free online file converter for images, PDFs, and documents.",
+    keywords: ["zolvstack products", "fileora", "file converter"],
     index: true,
     sitemap: true,
     follow: true,
@@ -327,9 +326,18 @@ const FILEORA_HUB_ROUTE: SeoRoute = {
   path: PATHS.FILEORA,
   product: "fileora",
   pageType: "product-hub",
-  title: productHubTitle(),
+  title: "Fileora — Free File Converter by ZolvStack",
   description:
-    "Fileora by ZolvStack — free, unlimited file conversion tools for images, PDFs, and documents. No signup required.",
+    "Fileora is ZolvStack’s free online file converter for images, PDFs, and documents. Convert files in your browser — no signup, no watermarks, private processing.",
+  keywords: [
+    "fileora",
+    "fileora converter",
+    "fileora by zolvstack",
+    "free file converter",
+    "image converter",
+    "pdf converter",
+    "online file converter",
+  ],
   faq: [...FILEORA_FAQS],
   index: true,
   sitemap: true,
@@ -338,6 +346,94 @@ const FILEORA_HUB_ROUTE: SeoRoute = {
   changeFrequency: "weekly",
 };
 
+type ToolRouteOverride = Partial<
+  Pick<
+    SeoRoute,
+    | "title"
+    | "description"
+    | "keywords"
+    | "index"
+    | "sitemap"
+    | "follow"
+    | "sitemapPriority"
+    | "changeFrequency"
+    | "faq"
+  >
+>;
+
+const PRIORITY_TOOL_OVERRIDES: Readonly<
+  Partial<Record<ToolSlug, ToolRouteOverride>>
+> = Object.freeze({
+  "image-to-webp": {
+    title: "Image to WebP Converter — JPG & PNG to WebP",
+    description:
+      "Convert images to WebP with Fileora. Free JPG to WebP and PNG to WebP converter in your browser — smaller files, no signup.",
+    keywords: [
+      "image to webp converter",
+      "jpg to webp",
+      "png to webp",
+      "convert to webp",
+      "fileora webp",
+    ],
+    index: true,
+    sitemap: true,
+    follow: true,
+    sitemapPriority: 0.8,
+    changeFrequency: "weekly",
+  },
+  "image-to-jpg": {
+    title: "Image to JPG Converter",
+    description:
+      "Convert PNG, WebP, and other images to JPG with Fileora by ZolvStack. Free online image converter — no signup.",
+    keywords: [
+      "image to jpg",
+      "png to jpg",
+      "webp to jpg",
+      "image converter",
+      "fileora",
+    ],
+    index: true,
+    sitemap: true,
+    follow: true,
+    sitemapPriority: 0.7,
+    changeFrequency: "weekly",
+  },
+  "image-to-png": {
+    title: "Image to PNG Converter",
+    description:
+      "Convert JPG, WebP, and other images to PNG with Fileora by ZolvStack. Free online image converter with transparency support.",
+    keywords: [
+      "image to png",
+      "jpg to png",
+      "webp to png",
+      "image converter",
+      "fileora",
+    ],
+    index: true,
+    sitemap: true,
+    follow: true,
+    sitemapPriority: 0.7,
+    changeFrequency: "weekly",
+  },
+  "pdf-compress": {
+    title: "PDF Compress — Free PDF Converter",
+    description:
+      "Compress PDF files online with Fileora by ZolvStack. Free PDF converter tool — smaller files, private browser processing, no signup.",
+    keywords: [
+      "pdf compress",
+      "pdf converter",
+      "compress pdf online",
+      "fileora pdf",
+      "file converter",
+    ],
+    index: true,
+    sitemap: true,
+    follow: true,
+    sitemapPriority: 0.7,
+    changeFrequency: "weekly",
+  },
+});
+
 function buildToolRoute(slug: ToolSlug): SeoRoute {
   return {
     id: slug,
@@ -345,6 +441,7 @@ function buildToolRoute(slug: ToolSlug): SeoRoute {
     product: "fileora",
     pageType: "product-tool",
     ...TOOL_ROUTE_DEFAULTS,
+    ...PRIORITY_TOOL_OVERRIDES[slug],
   };
 }
 

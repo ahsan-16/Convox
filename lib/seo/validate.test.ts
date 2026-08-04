@@ -702,21 +702,24 @@ describe("buildAuditReport", () => {
   });
 });
 
-describe("buildAuditReport — real registry, Task 9 initial indexing policy", () => {
+describe("buildAuditReport — real registry, phase-1 Fileora brand SEO indexing", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
 
-  it("recognized production + indexing enabled: the real registry indexes/sitemaps exactly the already-approved non-tool routes and zero tools", () => {
+  it("recognized production + indexing enabled: indexes approved brand routes plus priority tools only", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://example.com");
     vi.stubEnv("SEO_INDEXING_ENABLED", "true");
 
-    // No routes/redirects override: exercises the real, live `lib/seo/*`
-    // registry end to end, matching the "recognized-production/enabled
-    // audit using the actual config contract" requirement.
     const report = buildAuditReport();
 
+    const priorityTools = new Set([
+      "image-to-webp",
+      "image-to-jpg",
+      "image-to-png",
+      "pdf-compress",
+    ]);
     const toolSlugs = new Set(Object.keys(TOOL_CONFIG) as ToolSlug[]);
     const declaredIndexableCount = ROUTES.filter((route) => route.index).length;
 
@@ -726,7 +729,9 @@ describe("buildAuditReport — real registry, Task 9 initial indexing policy", (
 
     const indexedEntries = report.routes.filter((entry) => entry.effectiveIndex);
     for (const entry of indexedEntries) {
-      expect(toolSlugs.has(entry.id as ToolSlug)).toBe(false);
+      if (toolSlugs.has(entry.id as ToolSlug)) {
+        expect(priorityTools.has(entry.id)).toBe(true);
+      }
     }
 
     const homeEntry = report.routes.find((entry) => entry.id === "home");
@@ -734,15 +739,24 @@ describe("buildAuditReport — real registry, Task 9 initial indexing policy", (
     expect(homeEntry?.effectiveIndex).toBe(true);
     expect(hubEntry?.effectiveIndex).toBe(true);
 
+    for (const id of priorityTools) {
+      const tool = report.routes.find((entry) => entry.id === id);
+      expect(tool?.effectiveIndex).toBe(true);
+      expect(tool?.effectiveSitemap).toBe(true);
+    }
+
     for (const id of ["careers", "blog", "docs", "status"] as const) {
       const placeholder = report.routes.find((entry) => entry.id === id);
       expect(placeholder?.effectiveIndex).toBe(false);
       expect(placeholder?.effectiveSitemap).toBe(false);
     }
 
-    const toolEntries = report.routes.filter((entry) => toolSlugs.has(entry.id as ToolSlug));
-    expect(toolEntries.length).toBeGreaterThan(0);
-    for (const entry of toolEntries) {
+    const nonPriorityTools = report.routes.filter(
+      (entry) =>
+        toolSlugs.has(entry.id as ToolSlug) && !priorityTools.has(entry.id),
+    );
+    expect(nonPriorityTools.length).toBeGreaterThan(0);
+    for (const entry of nonPriorityTools) {
       expect(entry.effectiveIndex).toBe(false);
       expect(entry.effectiveSitemap).toBe(false);
       expect(entry.exclusionReason).toMatch(/not opted in/i);

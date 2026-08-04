@@ -95,9 +95,17 @@ describe("buildRootMetadata", () => {
     expect(first.alt).toMatch(/zolvstack/i);
   });
 
-  it("does not set keywords when the route has none configured", () => {
+  it("sets keywords when the home route authors them", () => {
     stubOrigin();
     const metadata = buildRootMetadata();
+    expect(metadata.keywords).toEqual(
+      expect.arrayContaining(["zolvstack", "fileora", "file converter"]),
+    );
+  });
+
+  it("does not set keywords when a route has none configured", () => {
+    stubOrigin();
+    const metadata = buildMetadataForRoute("about");
     expect(metadata.keywords).toBeUndefined();
   });
 });
@@ -111,13 +119,14 @@ describe("buildMetadataForRoute — tool title pattern", () => {
     stubOrigin();
     const metadata = buildMetadataForRoute("image-to-webp");
     expect(metadata.title).toEqual({
-      absolute: "Image to WebP Converter | Fileora by ZolvStack",
+      absolute:
+        "Image to WebP Converter — JPG & PNG to WebP | Fileora by ZolvStack",
     });
     expect(metadata.openGraph?.title).toBe(
-      "Image to WebP Converter | Fileora by ZolvStack",
+      "Image to WebP Converter — JPG & PNG to WebP | Fileora by ZolvStack",
     );
     expect(metadata.twitter?.title).toBe(
-      "Image to WebP Converter | Fileora by ZolvStack",
+      "Image to WebP Converter — JPG & PNG to WebP | Fileora by ZolvStack",
     );
   });
 
@@ -128,7 +137,9 @@ describe("buildMetadataForRoute — tool title pattern", () => {
       typeof metadata.title === "object" && metadata.title !== null
         ? (metadata.title as { absolute?: string }).absolute
         : undefined;
-    expect(absolute).toBe("Image to WebP Converter | Fileora by ZolvStack");
+    expect(absolute).toBe(
+      "Image to WebP Converter — JPG & PNG to WebP | Fileora by ZolvStack",
+    );
     expect(absolute).not.toBe("WebP");
     expect(absolute?.endsWith("| Fileora by ZolvStack")).toBe(true);
   });
@@ -297,10 +308,18 @@ describe("buildMetadataForRoute — fallback hierarchy (root -> product -> route
     expect(images[0]?.url).toContain("/og/zolvstack-default");
   });
 
-  it("prefers the substantive longDesc-backed description over the short TOOL_CONFIG label list", () => {
+  it("uses the authored route description when present for a priority tool", () => {
     stubOrigin();
     const metadata = buildMetadataForRoute("image-to-webp");
-    expect(metadata.description).toMatch(/webp format/i);
+    expect(metadata.description).toMatch(/jpg to webp/i);
+    expect(metadata.description).toMatch(/png to webp/i);
+    expect((metadata.description as string).length).toBeGreaterThan(40);
+  });
+
+  it("falls back to TOOL_CONFIG longDesc when a tool has no route description override", () => {
+    stubOrigin();
+    const metadata = buildMetadataForRoute("image-to-avif");
+    expect(metadata.description).toMatch(/avif/i);
     expect((metadata.description as string).length).toBeGreaterThan(40);
   });
 });
