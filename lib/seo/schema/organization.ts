@@ -50,7 +50,12 @@ export function buildOrganizationNode(): JsonLdNode {
     "@type": "Organization",
     "@id": organizationId(),
     name: ZOLVSTACK_BRAND.name,
-    alternateName: ["Zolv Stack", "zolv-stack", "zolvstack"],
+    alternateName: [
+      "Zolv Stack",
+      "zolv-stack",
+      "zolvstack",
+      "Zolvstack",
+    ],
     url: absoluteUrl(PATHS.HOME),
     logo: ref(logoImageId()),
     description: ORGANIZATION_DESCRIPTION,
@@ -60,6 +65,7 @@ export function buildOrganizationNode(): JsonLdNode {
       "document conversion",
       "PDF tools",
       "Fileora",
+      "Fileora by ZolvStack",
     ],
     sameAs: [...ORGANIZATION_SAME_AS],
   };

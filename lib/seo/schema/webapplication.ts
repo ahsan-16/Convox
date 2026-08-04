@@ -48,6 +48,8 @@ export function buildFileoraWebApplicationNode(): JsonLdNode {
       "Fileora by ZolvStack",
       "Fileora Converter",
       "Fileora File Converter",
+      "Fileora ZolvStack",
+      "ZolvStack Fileora",
     ],
     url: absoluteUrl(PATHS.FILEORA),
     description: resolveRouteDescription(hubRoute),
