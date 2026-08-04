@@ -61,8 +61,6 @@ export const ZOLVSTACK_FOOTER_SECTIONS: readonly FooterSection[] = Object.freeze
     title: "Products",
     links: [
       { label: "Fileora", href: "/fileora" },
-      { label: "Image to WebP", href: "/fileora/image-to-webp" },
-      { label: "PDF Merge", href: "/fileora/pdf-merge" },
       { label: "All Products", href: "/products" },
     ],
   },
