@@ -1,11 +1,20 @@
 "use client";
 
 import { Converter } from "@/components/tools/Converter";
-import { TOOL_CONFIG, TOOL_CATEGORIES, toolHref, type ToolSlug } from "@/lib/utils";
+import { ToolSeoContent } from "@/components/tools/ToolSeoContent";
+import { getFileoraToolContent } from "@/lib/fileora-tool-content";
+import { deriveIntentTitleFromSlug } from "@/lib/seo/content-resolver";
+import {
+  TOOL_CONFIG,
+  TOOL_CATEGORIES,
+  categoryIdForTool,
+  isToolDiscoverable,
+  toolHref,
+  type ToolSlug,
+} from "@/lib/utils";
 import Link from "next/link";
 import { useState } from "react";
 import { PdfSplitter } from "./pdfSplitter";
-
 
 const categoryMeta: Record<string, { label: string; color: string }> = {
   image: { label: "🖼️ Image Tools", color: "#00D084" },
@@ -14,30 +23,33 @@ const categoryMeta: Record<string, { label: string; color: string }> = {
   ai: { label: "✨ AI Tools", color: "#8B5CF6" },
 };
 
+function resolveVisibleH1(slug: ToolSlug, fallbackTitle: string): string {
+  const content = getFileoraToolContent(slug);
+  if (content?.h1) return content.h1;
+  if (slug.includes("-to-")) return deriveIntentTitleFromSlug(slug);
+  return fallbackTitle;
+}
+
 export function ToolPage({ slug }: { slug: ToolSlug }) {
   const [activeTool, setActiveTool] = useState<ToolSlug>(slug);
-  const [openCategory, setOpenCategory] = useState<string>("image");
+  const [openCategory, setOpenCategory] = useState<string>(() =>
+    categoryIdForTool(slug),
+  );
   const config = TOOL_CONFIG[activeTool];
-   
-  // old code
-  // const categories = Object.entries(TOOL_CATEGORIES).map(([id, slugs]) => ({
-  //   id,
-  //   label: categoryMeta[id]?.label ?? id,
-  //   color: categoryMeta[id]?.color ?? "#666",
-  //   tools: slugs
-  //     .map((s) => TOOL_CONFIG[s])
-  //     .filter((t) => t.slug !== activeTool),
-  // }));
+  const content = getFileoraToolContent(activeTool);
+  const visibleH1 = resolveVisibleH1(activeTool, config.title);
+  const heroLead = content?.intro ?? config.longDesc;
 
-  //new code
   const categories = Object.entries(TOOL_CATEGORIES)
-  .filter(([id]) => id === "image")
-  .map(([id, slugs]) => ({
-    id,
-    label: categoryMeta[id]?.label ?? id,
-    color: categoryMeta[id]?.color ?? "#666",
-    tools: slugs.map((s) => TOOL_CONFIG[s]).filter((t) => t.slug !== activeTool),
-  }));
+    .map(([id, slugs]) => ({
+      id,
+      label: categoryMeta[id]?.label ?? id,
+      color: categoryMeta[id]?.color ?? "#666",
+      tools: slugs
+        .filter((s) => isToolDiscoverable(s) && s !== activeTool)
+        .map((s) => TOOL_CONFIG[s]),
+    }))
+    .filter((cat) => cat.tools.length > 0);
 
   return (
     <>
@@ -99,30 +111,38 @@ export function ToolPage({ slug }: { slug: ToolSlug }) {
                   marginBottom: 10,
                 }}
               >
-                {config.title}
+                {visibleH1}
               </h1>
               <p
                 style={{
                   fontSize: 16,
                   color: "var(--color-text-2)",
-                  maxWidth: 560,
+                  maxWidth: 640,
                   lineHeight: 1.7,
                 }}
               >
-                {config.longDesc}
+                {heroLead}
               </p>
             </div>
           </div>
 
-          
           {slug === "pdf-split" ? (
-  <PdfSplitter />
-) : (
-  <Converter
-    tool={activeTool}
-    onToolChange={(t) => setActiveTool(t)}
-  />
-)}
+            <PdfSplitter />
+          ) : (
+            <Converter
+              tool={activeTool}
+              onToolChange={(t) => {
+                setActiveTool(t);
+                setOpenCategory(categoryIdForTool(t));
+              }}
+            />
+          )}
+
+          {content ? (
+            <div style={{ marginTop: 56 }}>
+              <ToolSeoContent content={content} />
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -142,7 +162,6 @@ export function ToolPage({ slug }: { slug: ToolSlug }) {
             Other tools
           </h3>
 
-          {/* Category tabs */}
           <div
             style={{
               display: "flex",
@@ -188,7 +207,6 @@ export function ToolPage({ slug }: { slug: ToolSlug }) {
             ))}
           </div>
 
-          {/* Tools grid — sirf open category ki */}
           {categories.map(
             (cat) =>
               openCategory === cat.id && (
@@ -196,67 +214,50 @@ export function ToolPage({ slug }: { slug: ToolSlug }) {
                   key={cat.id}
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(220px, 1fr))",
                     gap: 12,
                   }}
                 >
-                 {cat.tools.map((t) => {
-  const isComingSoon = t.slug === "image-enhance" || t.slug === "remove-bg";
-  return (
-    <Link
-      key={t.slug}
-      href={isComingSoon ? "#" : toolHref(t.slug)}
-      onClick={(e) => isComingSoon && e.preventDefault()}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        padding: "12px 16px",
-        background: "var(--color-bg-2)",
-        border: "1px solid var(--color-border)",
-        borderRadius: 12,
-        textDecoration: "none",
-        transition: "border-color 0.2s",
-        position: "relative",
-        opacity: isComingSoon ? 0.5 : 1,
-        cursor: isComingSoon ? "not-allowed" : "pointer",
-      }}
-    >
-      {isComingSoon && (
-        <span
-          style={{
-            position: "absolute",
-            top: 6,
-            right: 6,
-            fontSize: 9,
-            fontWeight: 700,
-            background: "rgba(245,158,11,0.15)",
-            color: "#F59E0B",
-            padding: "2px 6px",
-            borderRadius: 99,
-          }}
-        >
-          Coming Soon
-        </span>
-      )}
-      <span style={{ fontSize: 18 }}>{t.icon}</span>
-      <div>
-        <p
-          style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: "var(--color-text-1)",
-          }}
-        >
-          {t.title}
-        </p>
-        <p style={{ fontSize: 11, color: "var(--color-text-3)" }}>
-          {t.description}
-        </p>
-      </div>
-    </Link>
-  );
-})}
+                  {cat.tools.map((t) => (
+                    <Link
+                      key={t.slug}
+                      href={toolHref(t.slug)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        padding: "12px 16px",
+                        background: "var(--color-bg-2)",
+                        border: "1px solid var(--color-border)",
+                        borderRadius: 12,
+                        textDecoration: "none",
+                        transition: "border-color 0.2s",
+                        position: "relative",
+                      }}
+                    >
+                      <span style={{ fontSize: 18 }}>{t.icon}</span>
+                      <div>
+                        <p
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 600,
+                            color: "var(--color-text-1)",
+                          }}
+                        >
+                          {t.title}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: "var(--color-text-3)",
+                          }}
+                        >
+                          {t.description}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               ),
           )}

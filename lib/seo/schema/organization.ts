@@ -28,7 +28,7 @@ const LOGO_HEIGHT = 512;
 /** Organization description — mirrors the home route SEO description for
  * brand-entity clarity (helps disambiguate near-names like Zolve/Zolv). */
 const ORGANIZATION_DESCRIPTION =
-  "ZolvStack builds fast, private, browser-based tools for everyday work — starting with Fileora, a free file converter.";
+  "ZolvStack builds Fileora — a free online file converter for images, PDFs, and documents. Fast, private image and PDF conversion with no signup or watermarks.";
 
 /**
  * Official profile / social URLs for `Organization.sameAs`.

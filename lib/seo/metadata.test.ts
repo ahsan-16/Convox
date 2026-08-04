@@ -19,7 +19,7 @@ describe("buildRootMetadata", () => {
     const metadata = buildRootMetadata();
     expect(metadata.metadataBase).toEqual(new URL("https://example.com"));
     expect(metadata.title).toEqual({
-      default: "ZolvStack — Fast, Private Tools for Everyday Work",
+      default: "ZolvStack — Fileora Free File, Image & PDF Converter",
       template: "%s | ZolvStack",
     });
   });
@@ -72,10 +72,10 @@ describe("buildRootMetadata", () => {
     stubOrigin();
     const metadata = buildRootMetadata();
     expect(metadata.openGraph?.title).toBe(
-      "ZolvStack — Fast, Private Tools for Everyday Work",
+      "ZolvStack — Fileora Free File, Image & PDF Converter",
     );
     expect(metadata.twitter?.title).toBe(
-      "ZolvStack — Fast, Private Tools for Everyday Work",
+      "ZolvStack — Fileora Free File, Image & PDF Converter",
     );
   });
 

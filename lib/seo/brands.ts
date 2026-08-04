@@ -21,7 +21,8 @@ export interface Brand {
 export const ZOLVSTACK_BRAND: Readonly<Brand> = Object.freeze({
   id: "zolvstack",
   name: "ZolvStack",
-  tagline: "Fast, Private Tools for Everyday Work",
+  // ~54 chars with brandHomeTitle — targets ZolvStack + Fileora + converter intents.
+  tagline: "Fileora Free File, Image & PDF Converter",
   localeTag: "en_US",
 });
 
@@ -29,7 +30,8 @@ export const ZOLVSTACK_BRAND: Readonly<Brand> = Object.freeze({
 export const FILEORA_BRAND: Readonly<Brand> = Object.freeze({
   id: "fileora",
   name: "Fileora",
-  tagline: "Free File Converter",
+  // ~56 chars with productHubTitle — branded + file/image/PDF converter intents.
+  tagline: "Free File, Image & PDF Converter",
   localeTag: "en_US",
 });
 
@@ -94,7 +96,7 @@ export function brandStaticTitle(pageTitle: string): string {
 /**
  * Builds the product hub document title.
  *
- * Pattern: `Fileora — Free File Converter | ZolvStack`
+ * Pattern: `Fileora — Free File, Image & PDF Converter | ZolvStack`
  *
  * @param product - Product id; defaults to `fileora`
  * @param tagline - Optional product tagline override
