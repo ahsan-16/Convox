@@ -1153,18 +1153,6 @@ export const TOOL_CONFIG = {
 
 export type ToolSlug = keyof typeof TOOL_CONFIG;
 
-/**
- * Tools that exist in the registry but must not appear in hub / related-tool
- * discovery until they are production-ready (no placeholder or `#` links).
- */
-export const HIDDEN_FROM_DISCOVERY: ReadonlySet<ToolSlug> = new Set([
-  "remove-bg",
-]);
-
-export function isToolDiscoverable(slug: ToolSlug): boolean {
-  return !HIDDEN_FROM_DISCOVERY.has(slug);
-}
-
 // Sab image output formats
 const ALL_IMAGE_OUTPUTS: ToolSlug[] = [
   "image-to-webp",
@@ -1261,11 +1249,3 @@ export const TOOL_CATEGORIES: Record<string, ToolSlug[]> = {
   ],
   ai: ["image-enhance", "remove-bg"],
 };
-
-/** Resolves which TOOL_CATEGORIES bucket a tool belongs to. */
-export function categoryIdForTool(slug: ToolSlug): string {
-  for (const [id, slugs] of Object.entries(TOOL_CATEGORIES)) {
-    if (slugs.includes(slug)) return id;
-  }
-  return "image";
-}

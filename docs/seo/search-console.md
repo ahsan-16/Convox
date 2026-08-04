@@ -109,15 +109,9 @@ see the comment above `TOOL_ROUTE_DEFAULTS` in `lib/seo/routes.ts`). Do not
 submit an individual tool URL for indexing in GSC/Bing until its route is
 flipped to `index: true` in the registry and redeployed.
 
-Future tool opt-in process (documentation only until flags change):
-[`tool-index-quality-gate.md`](./tool-index-quality-gate.md) and
-[`phase-3-indexing-candidates.md`](./phase-3-indexing-candidates.md).
-
 ## Related
 
 - `docs/seo/url-policy.md` — canonical URL contract
 - `docs/seo/rollback.md` — safe rollback of indexing/verification/env
 - `docs/seo/performance-budgets.md` — CWV budgets that affect crawl/ranking signals
-- `docs/seo/tool-index-quality-gate.md` — objective tool index gate
-- `docs/seo/phase-3-indexing-candidates.md` — Wave 1 shortlist and rollout
 - `lib/seo/config.ts`, `lib/seo/metadata.ts`, `lib/seo/verification.ts` — implementation

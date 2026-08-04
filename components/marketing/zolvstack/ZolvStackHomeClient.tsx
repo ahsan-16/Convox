@@ -67,47 +67,24 @@ export function ZolvStackHomeClient() {
           style={{
             fontSize: "clamp(15px, 2vw, 18px)",
             color: "var(--color-text-2)",
-            maxWidth: 520,
+            maxWidth: 460,
             margin: "0 auto 48px",
             lineHeight: 1.75,
             fontWeight: 300,
           }}
         >
-          ZolvStack builds free, fast, and private web tools — starting with
-          Fileora, an online file, image, and PDF converter. No subscriptions,
-          no watermarks, no nonsense.
+          ZolvStack is a growing collection of free, fast, and private web
+          tools — no subscriptions, no watermarks, no nonsense.
         </p>
 
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 14,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+        <Link
+          href="/products"
+          className="btn-primary"
+          style={{ fontFamily: "var(--font-display)" }}
         >
-          <Link
-            href="/fileora"
-            className="btn-primary"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            Open Fileora
-            <span style={{ fontSize: 18 }}>→</span>
-          </Link>
-          <Link
-            href="/products"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: 14,
-              fontWeight: 600,
-              color: "var(--color-text-2)",
-              textDecoration: "none",
-            }}
-          >
-            Explore Products →
-          </Link>
-        </div>
+          Explore Products
+          <span style={{ fontSize: 18 }}>→</span>
+        </Link>
       </section>
 
       <section

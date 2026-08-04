@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ShieldCheck, Zap, Globe, Lock } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { TOOL_CONFIG, isToolDiscoverable, toolHref, type ToolSlug } from "@/lib/utils";
+import { TOOL_CONFIG, toolHref, type ToolSlug } from "@/lib/utils";
 import { useCallback, useState } from "react";
 import { SmartUploadWidget } from "@/components/tools/SmartUploadWidget";
 import { HeroConversionGraphic } from "@/components/marketing/HeroConversionGraphic";
@@ -15,10 +15,10 @@ import {
 } from "@/lib/format-catalog";
 import { FILEORA_FAQS } from "@/lib/fileora-faq";
 
-const tools = Object.values(TOOL_CONFIG).filter((t) =>
-  isToolDiscoverable(t.slug),
-);
+const tools = Object.values(TOOL_CONFIG);
 
+// Naye document-conversion tools ki list — ye office format se PDF banate hain
+// Naye document-conversion tools ki list
 const documentToolSlugs: ToolSlug[] = [
   "document-to-pdf",
   "document-to-docx",
@@ -41,35 +41,19 @@ const pdfTools = tools.filter((t) => t.slug.startsWith("pdf"));
 const documentTools = tools.filter((t) => documentToolSlugs.includes(t.slug));
 const aiTools = tools.filter((t) => aiToolSlugs.includes(t.slug));
 
+//old codee
+// const categories = [
+//   { id: "image", label: "🖼️ Image Tools", tools: imageTools, color: "#00D084" },
+//   { id: "pdf", label: "📄 PDF Tools", tools: pdfTools, color: "#6366F1" },
+//   { id: "document", label: "📝 Document Tools", tools: documentTools, color: "#F59E0B" },
+//   { id: "ai", label: "✨ AI Tools", tools: aiTools, color: "#8B5CF6" },
+// ];
+
+//new code
 const categories = [
   { id: "image", label: "🖼️ Image Tools", tools: imageTools, color: "#00D084" },
-  { id: "pdf", label: "📄 PDF Tools", tools: pdfTools, color: "#6366F1" },
-  {
-    id: "document",
-    label: "📝 Document Tools",
-    tools: documentTools,
-    color: "#F59E0B",
-  },
-  ...(aiTools.length > 0
-    ? [
-        {
-          id: "ai",
-          label: "✨ AI Tools",
-          tools: aiTools,
-          color: "#8B5CF6",
-        },
-      ]
-    : []),
 ];
 
-/** Priority converters surfaced near the tools heading for crawlability. */
-const PRIORITY_TOOL_LINKS: { href: string; label: string }[] = [
-  { href: toolHref("image-to-webp"), label: "Image to WebP" },
-  { href: toolHref("heic-to-jpg"), label: "HEIC to JPG" },
-  { href: toolHref("pdf-merge"), label: "PDF Merge" },
-  { href: toolHref("pdf-compress"), label: "PDF Compress" },
-  { href: toolHref("image-to-pdf"), label: "Image to PDF" },
-];
 const whyItems = [
   {
     icon: Zap,
@@ -377,30 +361,6 @@ export function FileoraHubClient() {
               Everything you need in one place. Click any tool to start
               converting instantly.
             </p>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "center",
-                gap: "8px 14px",
-                marginTop: 20,
-              }}
-            >
-              {PRIORITY_TOOL_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: "var(--color-brand)",
-                    textDecoration: "none",
-                  }}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
           </div>
 
           {/* Category tabs */}
@@ -478,10 +438,13 @@ export function FileoraHubClient() {
                     animation: "fadeIn 0.25s ease",
                   }}
                 >
-                 {cat.tools.map((t) => (
+                 {cat.tools.map((t) => {
+  const isComingSoon = t.slug === "image-enhance" || t.slug === "remove-bg";
+  return (
     <Link
       key={t.slug}
-      href={toolHref(t.slug)}
+      href={isComingSoon ? "#" : toolHref(t.slug)}
+      onClick={(e) => isComingSoon && e.preventDefault()}
       style={{
         display: "flex",
         alignItems: "center",
@@ -493,8 +456,27 @@ export function FileoraHubClient() {
         textDecoration: "none",
         transition: "border-color 0.2s",
         position: "relative",
+        opacity: isComingSoon ? 0.5 : 1,
+        cursor: isComingSoon ? "not-allowed" : "pointer",
       }}
     >
+      {isComingSoon && (
+        <span
+          style={{
+            position: "absolute",
+            top: 6,
+            right: 6,
+            fontSize: 9,
+            fontWeight: 700,
+            background: "rgba(245,158,11,0.15)",
+            color: "#F59E0B",
+            padding: "2px 6px",
+            borderRadius: 99,
+          }}
+        >
+          Coming Soon
+        </span>
+      )}
       <span style={{ fontSize: 18 }}>{t.icon}</span>
       <div>
         <p
@@ -511,7 +493,8 @@ export function FileoraHubClient() {
         </p>
       </div>
     </Link>
-  ))}
+  );
+})}
                 </div>
               ),
           )}

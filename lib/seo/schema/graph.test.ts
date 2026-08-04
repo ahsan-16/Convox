@@ -407,29 +407,9 @@ describe("buildJsonLdForRoute — product tool", () => {
     expect(findNode(graph, "SoftwareApplication")).toBeTruthy();
   });
 
-  it("emits FAQPage for Wave-1 tools that have authored FAQ content", () => {
-    stubOrigin();
-    const route = ROUTES.find((r) => r.id === "image-to-webp");
-    expect(route?.faq?.length).toBeGreaterThan(0);
-
-    const graph = buildJsonLdForRoute("image-to-webp");
-    const faqPage = findNode(graph, "FAQPage");
-    expect(faqPage).toBeDefined();
-    expect(faqPage?.mainEntity).toEqual(
-      route?.faq?.map(({ question, answer }) => ({
-        "@type": "Question",
-        name: question,
-        acceptedAnswer: { "@type": "Answer", text: answer },
-      })),
-    );
-  });
-
   it("omits FAQPage entirely when the route has no real FAQ content", () => {
     stubOrigin();
-    const route = ROUTES.find((r) => r.id === "pdf-split");
-    expect(route?.faq).toBeUndefined();
-
-    const graph = buildJsonLdForRoute("pdf-split");
+    const graph = buildJsonLdForRoute("image-to-webp");
     expect(nodesOfType(graph, "FAQPage")).toHaveLength(0);
   });
 });
