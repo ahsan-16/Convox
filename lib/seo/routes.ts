@@ -346,6 +346,7 @@ const FILEORA_HUB_ROUTE: SeoRoute = {
   keywords: [
     "fileora",
     "fileora converter",
+    "fileora file converter",
     "fileora by zolvstack",
     "fileora zolvstack",
     "zolvstack",
